@@ -1,6 +1,6 @@
 #include <stdio.h>
-#include <stdlib.h>
 #include <unistd.h>
+#include <stdlib.h>
   #include <sys/types.h>
   #include <sys/wait.h>
 #define NUM_PROC 3
@@ -14,11 +14,10 @@ int main (void)
 			exit(EXIT_FAILURE);
 		}else if (pid ==0){
 			printf("HIJO %d\n", i);
-			break;
 		}else{
 			printf ("PADRE %d\n", i);
 		}
+			wait();
+		}
+		exit(EXIT_SUCCESS);
 	}
-	wait(NULL);
-	exit(EXIT_SUCCESS);
-}

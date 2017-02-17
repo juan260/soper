@@ -1,0 +1,15 @@
+
+CC = gcc -ansi -pedantic
+CFLAGS = -Wall -g
+EXE = ejercicio4a1 ejercicio4a2 ejercicio4b1 ejercicio5a ejercicio5b ejercicio6 
+
+all : $(EXE)
+
+clean :
+	rm -f *.o $(EXE)
+
+$(EXE) : % : %.o
+	$(CC) $(CFLAGS) -o $@ $@.o
+
+$(EXE).o : % : %.c
+	$(CC) $(CFLAGS) -c $@.c

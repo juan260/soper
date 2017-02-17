@@ -1,6 +1,8 @@
 #include <stdio.h>
 #include <unistd.h>
 #include <stdlib.h>
+  #include <sys/types.h>
+  #include <sys/wait.h>
 #define NUM_PROC 3
 int main (void)
 {
@@ -15,7 +17,7 @@ int main (void)
 		}else{
 			printf ("PADRE %d\n", i);
 		}
-		wait()
+			wait(NULL);
 		}
 		exit(EXIT_SUCCESS);
 	}

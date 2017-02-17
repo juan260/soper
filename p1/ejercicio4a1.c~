@@ -1,8 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
-  #include <sys/types.h>
-  #include <sys/wait.h>
 #define NUM_PROC 3
 int main (void)
     {
@@ -17,7 +15,6 @@ int main (void)
                 printf("HIJO: pid %d, pid del padre %d\n", getpid(), getppid());
             }
         }
-        wait(NULL);
         exit(EXIT_SUCCESS);
 
                                          }

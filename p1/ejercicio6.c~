@@ -19,6 +19,5 @@ int main(int argc, char** argv){
 		strcpy(cadena, "Soy padre\n");
 	}
 	printf("%s", cadena);
-	wait(NULL);
 	exit(EXIT_SUCCESS);
 }

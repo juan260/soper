@@ -19,6 +19,6 @@ int main (void)
 			printf ("PADRE %d\n", i);
 		}
 	}
-	wait(NULL);
+	wait();
 	exit(EXIT_SUCCESS);
 }

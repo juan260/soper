@@ -17,7 +17,7 @@ int main (void)
                 printf("HIJO: pid %d, pid del padre %d\n", getpid(), getppid());
             }
         }
-        wait(NULL);
+        wait();
         exit(EXIT_SUCCESS);
 
                                          }
