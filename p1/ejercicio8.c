@@ -2,12 +2,14 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <string.h>
+#include <sys/wait.h>
 
 int main (int argc, char* argv[])
 {
 	int pid;
 	int num_proc = argc-2;
 	int i;
+    char *prog[2];
 	for (i=1; i <= num_proc; i++){
 		if ((pid=fork()) <0 ){
 			printf("Error haciendo fork\n");
@@ -20,15 +22,17 @@ int main (int argc, char* argv[])
 				execlp(argv[i], argv[i], (char*)NULL);
 			}
 			if (strcmp(argv[argc-1], "-v") == 0){
-				char *prog[] = {argv[i], NULL};
+				prog[0] = argv[i];
+                prog[1] = NULL;
 				execv(argv[i], prog);
 			}
 			if (strcmp(argv[argc-1], "-vp") == 0){
-				char *prog[] = {argv[i], NULL};
+				prog[0] = argv[i];
+                prog[1] = NULL;
 				execvp(argv[i], prog); 
 			}  
 		}    
 	}
-	wait();
+	wait(NULL);
 	exit(EXIT_SUCCESS);
 }
