@@ -71,7 +71,7 @@ int main(){
             exit(EXIT_FAILURE);
             }
  
-    }
+    
 
     else if((pid[suma])==0){
         close(pipeHijoAPadre[suma][LEER]);
