@@ -5,7 +5,7 @@
 #include <string.h>
 #define LEER 0
 #define ESCRIBIR 1
-#define MAXBUF 100
+#define MAXBUF 250
 
 enum OPERACION
 {
@@ -17,7 +17,7 @@ enum OPERACION
 
 int main(){
     int pipeHijoAPadre[4][2];
-    int pipePadreAHijo[4][2];
+    int pipePadreAHijo[2];
     int i, arg1, arg2, status, resultado, bytesLeidos;
     int pid[4];
     char op;
@@ -39,114 +39,182 @@ int main(){
     }
 
     /*Ahora los pipes con dirección de padre a hijo*/
-    for(i=0;i<4;i++){
-        if(pipe(pipePadreAHijo[i])==-1){
-            perror("Error al hacer pipe\n");
-            i--;
-            for(;i>=0;i--){
-                close(pipePadreAHijo[i][LEER]);
-                close(pipePadreAHijo[i][ESCRIBIR]);
+    if(pipe(pipePadreAHijo)==-1){
+        perror("Error al hacer pipe\n");
+       for(i=0;i<4;i++){
+                close(pipeHijoAPadre[i][LEER]);
+                close(pipeHijoAPadre[i][ESCRIBIR]);
             }
-            exit(EXIT_FAILURE);
-            }
+        
+        exit(EXIT_FAILURE);
     }
 
+
+
+    /*FORK DE LA SUMA*/
     if((pid[suma]=fork())==-1){
         perror("Error al hacer fork\n");
         for(i=0;i<4;i++){
-            close(pipePadreAHijo[i][LEER]);
-            close(pipePadreAHijo[i][ESCRIBIR]);
             close(pipeHijoAPadre[i][LEER]);
             close(pipeHijoAPadre[i][ESCRIBIR]);
 
         }
+        close(pipePadreAHijo[LEER]);
+        close(pipePadreAHijo[ESCRIBIR]);
         exit(EXIT_FAILURE);
     }
 
     else if((pid[suma])==0){
-/*        close(pipeHijoAPadre[suma][LEER]);
-        close(pipePadreAHijo[suma][ESCRIBIR]);
-  */      
-        bytesLeidos = read(pipePadreAHijo[suma][LEER], buffer, MAXBUF);
-        buffer[strlen(buffer)]=0;
+        close(pipeHijoAPadre[suma][LEER]);
+        close(pipePadreAHijo[ESCRIBIR]);
+        
+        bytesLeidos = read(pipePadreAHijo[LEER], buffer, MAXBUF);
         sscanf(buffer, "%d,%d\n", &arg1, &arg2);
         resultado=arg1+arg2;
         sprintf(buffer, "Datos enviados a través de la tubería por el proceso PID=%d\n"
         "Operando 1: %d. Operando 2: %d. Suma: %d\n", getpid(), arg1, arg2, resultado);
-        buffer[strlen(buffer)]=0;
 
-        write(pipeHijoAPadre[suma][ESCRIBIR], buffer, strlen(buffer));
+        write(pipeHijoAPadre[suma][ESCRIBIR], buffer, (strlen(buffer)+1));
         exit(EXIT_SUCCESS);
     }
-    
-    if((pid[resta]=fork())==0){
-        close(pipeHijoAPadre[resta][LEER]);
-        close(pipePadreAHijo[resta][ESCRIBIR]);
 
 
-        exit(EXIT_SUCCESS);
-                        }
 
-    if((pid[multi]=fork())==0){
-        close(pipeHijoAPadre[multi][LEER]);
-        close(pipePadreAHijo[multi][ESCRIBIR]);
-        
-                
-        exit(EXIT_SUCCESS);
+
+    /*FORK DE LA RESTA*/
+/*    
+    if((pid[resta]=fork())==-1){
+        perror("Error al hacer fork\n");
+        for(i=0;i<4;i++){
+            close(pipeHijoAPadre[i][LEER]);
+            close(pipeHijoAPadre[i][ESCRIBIR]);
+
         }
-    
-   if((pid[divi]=fork())==0){
-        close(pipeHijoAPadre[divi][LEER]);
-        close(pipePadreAHijo[divi][ESCRIBIR]);
- 
+        close(pipePadreAHijo[LEER]);
+        close(pipePadreAHijo[ESCRIBIR]);
+        exit(EXIT_FAILURE);
+    }
+
+    else if((pid[resta])==0){
+        close(pipeHijoAPadre[resta][LEER]);
+        close(pipePadreAHijo[ESCRIBIR]);
+
+        bytesLeidos = read(pipePadreAHijo[LEER], buffer, MAXBUF);
+        sscanf(buffer, "%d,%d\n", &arg1, &arg2);
+        
+        resultado=arg1-arg2;
+        sprintf(buffer, "Datos enviados a través de la tubería por el proceso PID=%d\n"
+        "Operando 1: %d. Operando 2: %d. Resta: %d\n", getpid(), arg1, arg2, resultado);
+
+        write(pipeHijoAPadre[resta][ESCRIBIR], buffer, (strlen(buffer)+1));
         exit(EXIT_SUCCESS);
     }
 
-    /*
+*/
+
+
+    /*FORK DE LA MULTIPLICACION*/
+/*
+    if((pid[multi]=fork())==-1){
+        perror("Error al hacer fork\n");
+        for(i=0;i<4;i++){
+            close(pipeHijoAPadre[i][LEER]);
+            close(pipeHijoAPadre[i][ESCRIBIR]);
+
+        }
+        close(pipePadreAHijo[LEER]);
+        close(pipePadreAHijo[ESCRIBIR]);
+        exit(EXIT_FAILURE);
+    }
+
+    else if((pid[multi])==0){
+        close(pipeHijoAPadre[multi][LEER]);
+        close(pipePadreAHijo[ESCRIBIR]);
+
+        bytesLeidos = read(pipePadreAHijo[LEER], buffer, MAXBUF);
+        sscanf(buffer, "%d,%d\n", &arg1, &arg2);
+
+        resultado=arg1*arg2;
+        sprintf(buffer, "Datos enviados a través de la tubería por el proceso PID=%d\n"
+        "Operando 1: %d. Operando 2: %d. Resta: %d\n", getpid(), arg1, arg2, resultado);
+
+        write(pipeHijoAPadre[multi][ESCRIBIR], buffer, (strlen(buffer)+1));
+        exit(EXIT_SUCCESS);
+    }
+
+*/
+
+    /*FORK DE LA DIVISION*/
+/*
+    if((pid[divi]=fork())==-1){
+        perror("Error al hacer fork\n");
+        for(i=0;i<4;i++){
+            close(pipeHijoAPadre[i][LEER]);
+            close(pipeHijoAPadre[i][ESCRIBIR]);
+
+        }
+        close(pipePadreAHijo[LEER]);
+        close(pipePadreAHijo[ESCRIBIR]);
+        exit(EXIT_FAILURE);
+    }
+
+    else if((pid[divi])==0){
+        close(pipeHijoAPadre[divi][LEER]);
+        close(pipePadreAHijo[ESCRIBIR]);
+
+        bytesLeidos = read(pipePadreAHijo[LEER], buffer, MAXBUF);
+        sscanf(buffer, "%d,%d\n", &arg1, &arg2);
+
+        resultado=arg1/arg2;
+        sprintf(buffer, "Datos enviados a través de la tubería por el proceso PID=%d\n"
+        "Operando 1: %d. Operando 2: %d. Resta: %d\n", getpid(), arg1, arg2, resultado);
+
+        write(pipeHijoAPadre[divi][ESCRIBIR], buffer, (strlen(buffer)+1));
+        exit(EXIT_SUCCESS);
+    }
+ */
     for(i=0;i<4;i++){
         close(pipeHijoAPadre[i][ESCRIBIR]);
-        close(pipePadreAHijo[i][LEER]);
     }
-*/
+    
+    close(pipePadreAHijo[LEER]);
     printf("Escriba una operacion en el formato a op b (por ejemplo: '1 + 3' sin las comillas):\n\t");
     scanf("%d %c %d", &arg1, &op, &arg2);
-    sprintf(buffer, "%d,%d\n", arg1, arg2);
-    buffer[strlen(buffer)]=0;
+
+
+    sprintf(buffer, "%d,%d", arg1, arg2);
     
-    if(op=='/'){
-        if(arg2==0){
+    if(op=='/' && arg2==0){
             perror("Error: división por cero");
             exit(EXIT_FAILURE);
-        }
     }
 
-    write(pipePadreAHijo[suma][ESCRIBIR], buffer, 5);
+    write(pipePadreAHijo[ESCRIBIR], buffer, (strlen(buffer)+1));
     
     for(i=0;i<4;i++){
-        waitpid(pid[i], &status, 0);
+        wait(&status);
     }
     
     
     if(op=='+')
-        bytesLeidos = read(pipeHijoAPadre[suma][LEER], buffer, MAXBUF);
+        bytesLeidos = read(pipeHijoAPadre[suma][LEER], buffer, MAXBUF-1);
 
     else if(op=='-')
-        bytesLeidos = read(pipeHijoAPadre[resta][LEER], buffer, MAXBUF);
+        bytesLeidos = read(pipeHijoAPadre[resta][LEER], buffer, MAXBUF-1);
 
     else if(op=='*')
-        bytesLeidos = read(pipeHijoAPadre[multi][LEER], buffer, MAXBUF);
+        bytesLeidos = read(pipeHijoAPadre[multi][LEER], buffer, MAXBUF-1);
 
     else if(op=='/'){
        
-        bytesLeidos = read(pipeHijoAPadre[divi][LEER], buffer, MAXBUF);
+        bytesLeidos = read(pipeHijoAPadre[divi][LEER], buffer, MAXBUF-1);
     }
     else{
         perror("Error en la entrada de argumentos");
         exit(EXIT_FAILURE);
 
     }
-    buffer[strlen(buffer)]=0;
 
-    printf("\n%s\n%d %d\n", buffer, bytesLeidos, (int)strlen(buffer));
+    printf("\n%s\n", buffer);
     exit(EXIT_SUCCESS);
 }
