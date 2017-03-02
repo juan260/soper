@@ -1,3 +1,17 @@
+/**
+* @brief Fuente del ejercicio 4, apartado b
+*
+* Este modulo hace una serie de forks e imprime
+* los pid del padre y del hijo de cada uno de estos.
+* Además el padre espera a que sus hijos terminen
+* @file ejercicio4a.c
+* @author Juan Riera y Carlos Isasa
+* @version 1.0
+* @date 02-03-2017
+*/
+
+
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
