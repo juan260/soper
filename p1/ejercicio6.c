@@ -6,7 +6,7 @@
 #include <sys/wait.h>
 int main(int argc, char** argv){
 	char * cadena;
-	int pid;
+	int pid, status;
 	cadena=(char*)malloc(sizeof(char)*80);
 	pid=fork();
 	if(pid<0){
@@ -14,13 +14,15 @@ int main(int argc, char** argv){
 		free(cadena);
         exit(EXIT_FAILURE);	
 	}else if(pid==0){
-		strcpy(cadena, "Soy hijo\n");
-			
+		printf("\nEscriba una cadena para almacenar en la variable del proceso hijo: \n");
+		scanf("%s", cadena);	
+		printf("Ahora se imprimira el contenido de 'cadena' en el proceso padre e hijo para ver si coinciden:\n");
 	}else{
+		
+		wait(&status);
 		strcpy(cadena, "Soy padre\n");
 	}
-	printf("%s", cadena);
-	wait(NULL);
-    free(cadena);
+	printf("%s\n", cadena);
+    	free(cadena);
 	exit(EXIT_SUCCESS);
 }

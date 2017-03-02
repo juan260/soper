@@ -174,6 +174,9 @@ int main(){
         close(pipeHijoAPadre[i][ESCRIBIR]);
     }
     
+
+	/*Proceso padre*/
+
     close(pipePadreAHijo[suma][LEER]);
     printf("Escriba una operacion en el formato a op b (por ejemplo: '1 + 3' sin las comillas):\n\t");
     scanf("%d %c %d", &arg1, &op, &arg2);
