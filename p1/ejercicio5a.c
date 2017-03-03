@@ -1,3 +1,13 @@
+/**
+* @brief Fuente del ejercicio 5a
+*
+* Este programa ejecuta una serie de forks de tal forma que un padre solo puede tener un único hijo.
+* @file ejercicio5a.c
+* @author Juan Riera Gomez (juan.riera@estudiante.uam.es) y Carlos Ignacio Isasa Martín (carlos.isasa@estudiante.uam.es)
+* @version 1.0
+* @date 02-03-2017
+*/
+
 #include <stdio.h>
 #include <unistd.h>
 #include <stdlib.h>
@@ -15,12 +25,12 @@ int main (void)
             exit(EXIT_FAILURE);
         }else if (pid ==0){
             printf("HIJO %d\n", i);
-        	exit(EXIT_SUCCESS);
-	}else{
+	    }else{
             printf ("PADRE %d\n", i);
             wait(&status);
-            exit(EXIT_SUCCESS);
+            break;
         }
     
     }
-    }
+    exit(EXIT_SUCCESS);
+}

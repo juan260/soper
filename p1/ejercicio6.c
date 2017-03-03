@@ -1,3 +1,16 @@
+/**
+* @brief Fuente del ejercicio 6
+*
+* Este programa reserva memoria para una cadena, y hace un fork. En cada proceso
+* resultante del fork almacena un valor en la cadena (uno pedido al usuario por línea de comandos
+* y otro ya elegido) y muestra, finalmente, los dos valores, demostrando que no tienen relación entre ellos.
+* @file ejercicio6.c
+* @author Juan Riera Gomez (juan.riera@estudiante.uam.es) y Carlos Ignacio Isasa Martín (carlos.isasa@estudiante.uam.es)
+* @version 1.0
+* @date 02-03-2017
+*/
+
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>

@@ -4,10 +4,11 @@
 * Este modulo hace una serie de forks e imprime
 * los pid del padre y del hijo de cada uno de estos.
 * @file ejercicio4a.c
-* @author Juan Riera y Carlos Isasa
+* @author Juan Riera Gomez (juan.riera@estudiante.uam.es) y Carlos Ignacio Isasa Martín (carlos.isasa@estudiante.uam.es)
 * @version 1.0
 * @date 02-03-2017
 */
+
 
 #include <stdio.h>
 #include <stdlib.h>

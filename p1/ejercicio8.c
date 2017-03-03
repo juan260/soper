@@ -1,3 +1,13 @@
+/**
+* @brief Fuente del ejercicio 8
+*
+* @file ejercicio8.c
+* @author Juan Riera Gomez (juan.riera@estudiante.uam.es) y Carlos Ignacio Isasa Martín (carlos.isasa@estudiante.uam.es)
+* @version 1.0
+* @date 02-03-2017
+*/
+
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
