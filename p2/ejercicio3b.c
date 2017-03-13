@@ -6,12 +6,15 @@
 #include <sys/types.h>
 #include <sys/wait.h>
 #include <limits.h>
-#define NUMPROC 100
+#include <pthread.h>
+
+#define NUMTHREAD 100
 
 void * calculaPrimos(void * arg){
     int N = *((int *)arg);
-    
+
     int *primos, j, k, flag;
+    
     primos=(int *)malloc(sizeof(int)*(N+1));
     primos[0]=2;
     for(j=1;j<N;j++){
@@ -33,37 +36,40 @@ void * calculaPrimos(void * arg){
         }
     }
     free(primos);
-    exit(EXIT_SUCCESS);
+ 
+    pthread_exit(NULL);
 }
 
 int main(int argc, char ** argv)
 {	
 	struct timeval ti, tf;
 	double miliseconds; 
-	int i, ret, N;
-    
+	int i, N;
+    pthread_t thread[NUMTHREAD];    
     if(argc!=2){
         perror("Error en la entrada de argumentos. Se debe de escribir"
-        "\n en linea de comandos:\n\n\t./ejercicio3a N\n\nDonde N es"
+        "\n en linea de comandos:\n\n\t./ejercicio3b N\n\nDonde N es"
         " la cantidad de numeros primos a calcular");
         exit(EXIT_FAILURE);
         }
     N=atoi(argv[1]);
 	gettimeofday(&ti, NULL);
 
-	for(i=0;i<NUMPROC;i++)
+	for(i=0;i<NUMTHREAD;i++)
 	{
-		if((ret=fork())<0)
-		{
-			perror("Error al hacer fork");
-			while(wait(NULL)>0){}
-			exit(EXIT_FAILURE);
-		} else if(ret) {
-	        calculaPrimos((void *)(&N));	
+        if(pthread_create(&thread[i], NULL, calculaPrimos, (void*)(&N))){
+            perror("Error al crear el thread\n");
+            for(i--;i>0;i--){
+                pthread_join(thread[i], NULL);
+            }
+
+            exit(EXIT_FAILURE);
         }
 	}
 	
-	while(wait(NULL)>0){}
+	for(i=0;i<NUMTHREAD;i++){
+        pthread_join(thread[i], NULL);
+    }
 	gettimeofday(&tf, NULL);
 	miliseconds = (tf.tv_sec-ti.tv_sec)*1000+(tf.tv_usec-ti.tv_usec)/1000.0;
 	printf("Milisegundos transcurridos: %f\n", miliseconds);
