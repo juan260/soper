@@ -13,7 +13,7 @@ int main()
 {
     int ret, fileread, filewrite, i=0;
     char buffer[MAXBUF];
-    char word[][]={"EL", "PROCESO"};
+    char * word[]={"EL","PROCESO"};
     
     while(i<50){
         ret=fork();
@@ -25,7 +25,7 @@ int main()
             filewrite=open("fichero.txt", O_WRONLY, O_CREAT);
             do{
                 i=(int)(rand()%2);
-            }while(strcmp(word[i],"FIN"))
+            }while(strcmp(word[i],"FIN"));
             close(filewrite);
             exit(EXIT_SUCCESS);
         } else {
