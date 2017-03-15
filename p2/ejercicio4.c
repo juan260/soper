@@ -154,7 +154,7 @@ int main ()
 	
 	matrix_free(m);
 
-	matrix_free(m);
+
 
 	return 1;
 }
