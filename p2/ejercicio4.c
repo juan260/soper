@@ -87,13 +87,14 @@ void matrix_free(Matrix *m){
 	}
 	free(m->matrix1);
 	free(m->matrix2);
+	free(m);
 }
 
 void *first_matrix (void *matrix){
 	Matrix *m = (Matrix*) matrix;
 	int i, j;
 	for (i = 0; i<m->dim; i++){
-		printf("Hilo 1 multiplicando fila %d resultado", i);
+		printf("Hilo 1 multiplicando fila %d resultado: ", i);
 		for (j=0; j<m->dim; j++){
 			printf("%d ", m->matrix1[i][j]*m->mul1);
 		}
@@ -108,7 +109,7 @@ void *second_matrix (void *matrix){
 	Matrix *m = (Matrix*) matrix;
 	int i, j;
 	for (i = 0; i<m->dim; i++){
-		printf("Hilo 2 multiplicando fila %d resultado", i);
+		printf("Hilo 2 multiplicando fila %d resultado: ", i);
 		for (j=0; j<m->dim; j++){
 			printf("%d ", m->matrix2[i][j]*m->mul2);
 		}
@@ -150,6 +151,8 @@ int main ()
 
 	pthread_join(T1, NULL);
 	pthread_join(T2, NULL);
+
+	matrix_free(m);
 
 	return 1;
 }
