@@ -1,3 +1,16 @@
+/**
+* @brief Fuente del ejercicio 3a
+*
+* Este programa crea un numero de procesos hijo (definido por NUMPROC)
+* y cada uno de éstos llama a la funcion calculaPrimos, que recibe
+* como argumento el número de primos a calcular, y calcula ese número 
+* de primos.
+* @file ejercicio3a.c
+* @author Juan Riera Gomez (juan.riera@estudiante.uam.es) y Carlos Ignacio Isasa Martín (carlos.isasa@estudiante.uam.es)
+* @version 1.0
+* @date 15-03-2017
+*/
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -7,6 +20,13 @@
 #include <sys/wait.h>
 #include <limits.h>
 #define NUMPROC 100
+
+
+/**
+* Función calcula primos:
+* Calcula un número entero de números primos que recibe por parámetros.
+* @param (void*)(int arg): número de primos a calular
+*/
 
 void * calculaPrimos(void * arg){
     int N = *((int *)arg);
