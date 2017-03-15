@@ -6,39 +6,64 @@
 #include <sys/types.h>
 #include <sys/wait.h>
 #include <fcntl.h>
-#define MAXBUF 200
+#include <time.h>
+#define MAXBUF 1024
 
 
 int main()
 {
-    int ret, fileread, filewrite, i=0;
+    int ret, file, i=0;
     char buffer[MAXBUF];
-    char * word[]={"EL","PROCESO"};
+    char * word[]={"EL\n","PROCESO\n", "A\n", "ESCRIBE\n", "EN\n", "UN\n", "FICHERO\n", 
+        "HASTA\n", "QUE\n", "LEE\n", "LA\n", "CADENA\n", "FIN\n"};
     
+    file=open("fichero.txt", O_RDWR);
+    if(file<0){
+        perror("Error een la apertura del fichero\n");
+        exit(EXIT_FAILURE);
+        }
+
     while(i<50){
         ret=fork();
+        
+        /*Cambiamos la semilla de vez en cuando*/
+        srand(time(NULL));
         if(ret<0){
             perror("Error al hacer fork\n");
             while(wait(NULL)<0){}
             exit(EXIT_FAILURE);
+        
         } else if (ret==0) {
-            filewrite=open("fichero.txt", O_WRONLY, O_CREAT);
+            
+            
             do{
-                i=(int)(rand()%2);
-            }while(strcmp(word[i],"FIN"));
-            close(filewrite);
+                /*Escribimos al principio del fichero colocándonos al principio para borrar
+                lo que hubiera*/
+
+                lseek(file, 0, SEEK_SET);
+                i=(int)(rand()%13);
+                
+                write(file, word[i], strlen(word[i])+1);
+            }while(strcmp(word[i],"FIN\n"));
+            
+            close(file);
             exit(EXIT_SUCCESS);
+        
         } else {
-            fileread=open("fichero.txt", O_RDONLY, O_CREAT);
-            for(;i<50;i++){
-                read(fileread, buffer, MAXBUF);
-                sleep(5);
-                if(strcmp(buffer, "FIN")==0) break;
+        
+            
+            while(i<50){
+                lseek(file, 0, SEEK_SET);
+                read(file, buffer, MAXBUF);
+                i++;
+                sleep(1);
+                if(strcmp(buffer, "FIN\n")==0) break;
             }
+            
             wait(NULL);
-            close(fileread);
+            close(file);
         }
     }
     
-
+    exit(EXIT_SUCCESS);
 }
