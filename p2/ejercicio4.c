@@ -1,3 +1,14 @@
+/**
+* @brief Fuente del ejercicio 4
+* Este programa pide al usuario dos matrices y dos factores para multiplicarlas. Multiplica
+* cada una por un factor en dos hilos distintos que además mantienen una comunicación para saber por donde
+* va el otro
+* @file ejercicio4.c
+* @author Juan Riera Gomez (juan.riera@estudiante.uam.es) y Carlos Ignacio Isasa Martín (carlos.isasa@estudiante.uam.es)
+* @version 1.0
+* @date 14-03-2017
+*/
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
