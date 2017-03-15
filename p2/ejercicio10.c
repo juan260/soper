@@ -24,10 +24,11 @@ int main()
         }
 
     while(i<50){
+        /*Cambiamos la semilla cada vez que iniciamos un nuevo proceso*/
+        srand(time(NULL));
+
         ret=fork();
         
-        /*Cambiamos la semilla de vez en cuando*/
-        srand(time(NULL));
         if(ret<0){
             perror("Error al hacer fork\n");
             while(wait(NULL)<0){}
