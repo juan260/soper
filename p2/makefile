@@ -1,7 +1,7 @@
 
 CC = gcc -ansi -pedantic
 CFLAGS = -Wall -g
-EXE = ejercicio3a ejercicio3b ejercicio6 ejercicio8 ejercicio10 ejercicio10b
+EXE = ejercicio3a ejercicio3b ejercicio4 ejercicio6 ejercicio8 ejercicio10 ejercicio10b
 
 all : $(EXE)
 
@@ -17,8 +17,11 @@ ejercicio6.o : ejercicio6.c
 ejercicio3a.o : ejercicio3a.c
 	$(CC) $(CFLAGS) -c ejercicio3a.c
 
-ejerciio3b.o : ejercicio3b.c
-	$(CC) $(CFLAGS) -c ejercicio3b.c 
+ejercicio3b.o : ejercicio3b.c
+	$(CC) $(CFLAGS) -c ejercicio3b.c
+
+ejercicio4.o: ejercicio4.c
+	$(CC) $(CFLAGS) -c ejercicio4.c 
 
 ejercicio10.o : ejercicio10.c
 	gcc -g -c ejercicio10.c
