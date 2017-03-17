@@ -1,0 +1,81 @@
+\hypertarget{ejercicio3a_8c}{}\section{Referencia del Archivo ejercicio3a.\+c}
+\label{ejercicio3a_8c}\index{ejercicio3a.\+c@{ejercicio3a.\+c}}
+
+
+Fuente del ejercicio 3a.  
+
+
+{\ttfamily \#include $<$stdio.\+h$>$}\\*
+{\ttfamily \#include $<$stdlib.\+h$>$}\\*
+{\ttfamily \#include $<$unistd.\+h$>$}\\*
+{\ttfamily \#include $<$string.\+h$>$}\\*
+{\ttfamily \#include $<$sys/time.\+h$>$}\\*
+{\ttfamily \#include $<$sys/types.\+h$>$}\\*
+{\ttfamily \#include $<$sys/wait.\+h$>$}\\*
+{\ttfamily \#include $<$limits.\+h$>$}\\*
+Dependencia gráfica adjunta para ejercicio3a.\+c\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{ejercicio3a_8c__incl}
+\end{center}
+\end{figure}
+\subsection*{\textquotesingle{}defines\textquotesingle{}}
+\begin{DoxyCompactItemize}
+\item 
+\#define {\bfseries N\+U\+M\+P\+R\+OC}~100\hypertarget{ejercicio3a_8c_a6918fedc593652387b93ea5832745bbb}{}\label{ejercicio3a_8c_a6918fedc593652387b93ea5832745bbb}
+
+\end{DoxyCompactItemize}
+\subsection*{Funciones}
+\begin{DoxyCompactItemize}
+\item 
+void $\ast$ \hyperlink{ejercicio3a_8c_a6be374870e70ff630544dfbbca42cf85}{calcula\+Primos} (void $\ast$arg)
+\item 
+int {\bfseries main} (int argc, char $\ast$$\ast$argv)\hypertarget{ejercicio3a_8c_a3c04138a5bfe5d72780bb7e82a18e627}{}\label{ejercicio3a_8c_a3c04138a5bfe5d72780bb7e82a18e627}
+
+\end{DoxyCompactItemize}
+
+
+\subsection{Descripción detallada}
+Fuente del ejercicio 3a. 
+
+Fuente del ejercicio 6.
+
+Este programa crea un numero de procesos hijo (definido por N\+U\+M\+P\+R\+OC) y cada uno de éstos llama a la funcion calcula\+Primos, que recibe como argumento el número de primos a calcular, y calcula ese número de primos.
+
+\begin{DoxyAuthor}{Autor}
+Juan Riera Gomez (\href{mailto:juan.riera@estudiante.uam.es}{\tt juan.\+riera@estudiante.\+uam.\+es}) y Carlos Ignacio Isasa Martín (\href{mailto:carlos.isasa@estudiante.uam.es}{\tt carlos.\+isasa@estudiante.\+uam.\+es}) 
+\end{DoxyAuthor}
+\begin{DoxyVersion}{Versión}
+1.\+0 
+\end{DoxyVersion}
+\begin{DoxyDate}{Fecha}
+15-\/03-\/2017
+\end{DoxyDate}
+Este programa crea un proceso hijo que escribe por pantalla y espera 5 segundos. El proceso padre espera 30 y mata al proceso hijo.
+
+\begin{DoxyAuthor}{Autor}
+Juan Riera Gomez (\href{mailto:juan.riera@estudiante.uam.es}{\tt juan.\+riera@estudiante.\+uam.\+es}) y Carlos Ignacio Isasa Martín (\href{mailto:carlos.isasa@estudiante.uam.es}{\tt carlos.\+isasa@estudiante.\+uam.\+es}) 
+\end{DoxyAuthor}
+\begin{DoxyVersion}{Versión}
+1.\+0 
+\end{DoxyVersion}
+\begin{DoxyDate}{Fecha}
+15-\/03-\/2017 
+\end{DoxyDate}
+
+
+\subsection{Documentación de las funciones}
+\index{ejercicio3a.\+c@{ejercicio3a.\+c}!calcula\+Primos@{calcula\+Primos}}
+\index{calcula\+Primos@{calcula\+Primos}!ejercicio3a.\+c@{ejercicio3a.\+c}}
+\subsubsection[{\texorpdfstring{calcula\+Primos(void $\ast$arg)}{calculaPrimos(void *arg)}}]{\setlength{\rightskip}{0pt plus 5cm}void$\ast$ calcula\+Primos (
+\begin{DoxyParamCaption}
+\item[{void $\ast$}]{arg}
+\end{DoxyParamCaption}
+)}\hypertarget{ejercicio3a_8c_a6be374870e70ff630544dfbbca42cf85}{}\label{ejercicio3a_8c_a6be374870e70ff630544dfbbca42cf85}
+Función calcula primos\+: Calcula un número entero de números primos que recibe por parámetros. 
+\begin{DoxyParams}{Parámetros}
+{\em (void$\ast$)(int} & arg)\+: número de primos a calular \\
+\hline
+\end{DoxyParams}

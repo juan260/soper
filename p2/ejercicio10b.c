@@ -1,18 +1,15 @@
 /**
-* @brief Fuente del ejercicio 10
+* @brief Fuente del ejercicio 10, versión2
 *
-* El programa ejercicio10 ejercutará un fork, del resultado del cual
-* el hijo escribirá en un fichero una palabra aleatoria de la frase 
-* del enunciado, y si escribe la palabra "FIN" termina su ejecución.
-* El padre esperará 5 segundos y leerá una palabra, si ésta es
-* "FIN", entenderá que su hijo ha terminado y lo reanimará. Si no, 
-* continuará. Este proceso se ejecuta 50 veces.
-* @file ejercicio10.c
+* Este es el ejercicio 10, pero una segunda versión que imprime
+* cada lectura y cada escritura cada vez que se ejecuta, 
+* ya que no se especifica ninguna salida por pantalla.
+* Por lo demás no se diferencia en nada del fuente "ejercicio10.c"
+* @file ejercicio10b.c
 * @author Juan Riera Gomez (juan.riera@estudiante.uam.es) y Carlos Ignacio Isasa Martín (carlos.isasa@estudiante.uam.es)
-* @version 1.0
+* @version 2.0
 * @date 15-03-2017
 */
-
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -30,6 +27,7 @@
 * que no tiene nada, ya que nos interesa que simplemente
 * espere a la llegada de la señal y continúe su ejecución.
 */
+
 void manejador_sigalrm(int sig){
 }
 
@@ -65,6 +63,7 @@ int main()
             do{
                 i=(int)(rand()%13);
                 fprintf(write, "%s ", word[i]);
+                printf("Escrito: '%s'\n", word[i]);
             }while(strcmp(word[i],"FIN")!=0);
             
             fclose(write);
@@ -114,10 +113,12 @@ int main()
                 aunque podemos estar prácticamente seguros de que lo ha hecho */
                 
                 if(feof(read)){
+                    printf("Final de fichero");
                     continue;
                 }
 
                 fscanf(read, "%s ", buffer);
+                printf("\tLEIDO: %s\n", buffer);
                 i++;
   
                 if(strcmp(buffer, "FIN")==0) break;

@@ -1,5 +1,5 @@
 /**
-* @brief Fuente del ejercicio 3a
+* @brief Fuente del ejercicio 3b
 *
 * Este programa crea un numero de hilos hijo (definido por NUMTHREAD)
 * y cada uno de éstos llama a la funcion calculaPrimos, que recibe
