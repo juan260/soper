@@ -18,22 +18,12 @@
 #include <fcntl.h>
 #include <time.h>
 
+char *tiempo();
 
-char *tiempo() { 
-    time_t tiempo = time(0); 
-    struct tm *tlocal = localtime(&tiempo); 
-    char *output=(char*)malloc(sizeof(char)*128); 
-    strftime(output, 128, "%d/%m/%y %H:%M:%S", tlocal); 
-    return output; 
-}
+void  manejador_sigusr1(int sig);
 
-void  manejador_sigusr1(int sig){
-    printf("Hola PID=%d, time=%s\n", getpid(), tiempo());
-}
+void manejador_sigterm(int sig);
 
-void manejador_sigterm(int sig){
-    printf("Muere PID=%d\n", getpid());
-}
 
 int main (int argc, char* argv[])
 {
@@ -55,14 +45,14 @@ int main (int argc, char* argv[])
     rootpid = getpid();
 
     if(signal(SIGUSR1, manejador_sigusr1)==SIG_ERR){
-	perror("Error con la señal SIGUSR1");
-	exit(EXIT_FAILURE);
-	}
+    perror("Error con la señal SIGUSR1");
+    exit(EXIT_FAILURE);
+    }
     
-    if(signal(SIGTERM, manejador_sigusr1)==SIG_ERR){
-	perror("Error con la señal SIGTERM");
-	exit(EXIT_FAILURE);
-	}
+    if(signal(SIGTERM, manejador_sigterm)==SIG_ERR){
+    perror("Error con la señal SIGTERM");
+    exit(EXIT_FAILURE);
+    }
     for (i=0; i<numProcesos; i++){
         if ((pid=fork()) <0 ){
             printf("Error haciendo fork\n");
@@ -90,4 +80,28 @@ int main (int argc, char* argv[])
         }
     }
     exit(EXIT_SUCCESS);
+}
+
+char *tiempo() { 
+    time_t tiempo = time(0); 
+    struct tm *tlocal = localtime(&tiempo); 
+    char *output=(char*)malloc(sizeof(char)*128); 
+    strftime(output, 128, "%d/%m/%y %H:%M:%S", tlocal); 
+    return output; 
+}
+
+void  manejador_sigusr1(int sig){
+    printf("Hola PID=%d, time=%s\n", getpid(), tiempo());
+    if(signal(SIGUSR1, manejador_sigusr1)==SIG_ERR){
+        perror("Error con la señal SIGUSR1");
+        exit(EXIT_FAILURE);
+    }
+}
+
+void manejador_sigterm(int sig){
+    printf("Muere PID=%d\n", getpid());
+    if(signal(SIGTERM, manejador_sigusr1)==SIG_ERR){
+        perror("Error con la señal SIGTERM");
+        exit(EXIT_FAILURE);
+    }
 }
