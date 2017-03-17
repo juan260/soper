@@ -1,0 +1,137 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=9"/>
+<meta name="generator" content="Doxygen 1.8.11"/>
+<title>Práctica 1 - SOPER: Referencia del Archivo ejercicio8.c</title>
+<link href="tabs.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="jquery.js"></script>
+<script type="text/javascript" src="dynsections.js"></script>
+<link href="search/search.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="search/searchdata.js"></script>
+<script type="text/javascript" src="search/search.js"></script>
+<script type="text/javascript">
+  $(document).ready(function() { init_search(); });
+</script>
+<link href="doxygen.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<div id="top"><!-- do not remove this div, it is closed by doxygen! -->
+<div id="titlearea">
+<table cellspacing="0" cellpadding="0">
+ <tbody>
+ <tr style="height: 56px;">
+  <td id="projectalign" style="padding-left: 0.5em;">
+   <div id="projectname">Práctica 1 - SOPER
+   </div>
+  </td>
+ </tr>
+ </tbody>
+</table>
+</div>
+<!-- end header part -->
+<!-- Generado por Doxygen 1.8.11 -->
+<script type="text/javascript">
+var searchBox = new SearchBox("searchBox", "search",false,'Buscar');
+</script>
+  <div id="navrow1" class="tabs">
+    <ul class="tablist">
+      <li><a href="index.html"><span>Página&#160;principal</span></a></li>
+      <li><a href="annotated.html"><span>Estructuras&#160;de&#160;Datos</span></a></li>
+      <li class="current"><a href="files.html"><span>Archivos</span></a></li>
+      <li>
+        <div id="MSearchBox" class="MSearchBoxInactive">
+        <span class="left">
+          <img id="MSearchSelect" src="search/mag_sel.png"
+               onmouseover="return searchBox.OnSearchSelectShow()"
+               onmouseout="return searchBox.OnSearchSelectHide()"
+               alt=""/>
+          <input type="text" id="MSearchField" value="Buscar" accesskey="S"
+               onfocus="searchBox.OnSearchFieldFocus(true)" 
+               onblur="searchBox.OnSearchFieldFocus(false)" 
+               onkeyup="searchBox.OnSearchFieldChange(event)"/>
+          </span><span class="right">
+            <a id="MSearchClose" href="javascript:searchBox.CloseResultsWindow()"><img id="MSearchCloseImg" border="0" src="search/close.png" alt=""/></a>
+          </span>
+        </div>
+      </li>
+    </ul>
+  </div>
+  <div id="navrow2" class="tabs2">
+    <ul class="tablist">
+      <li><a href="files.html"><span>Lista&#160;de&#160;archivos</span></a></li>
+      <li><a href="globals.html"><span>Globales</span></a></li>
+    </ul>
+  </div>
+<!-- window showing the filter options -->
+<div id="MSearchSelectWindow"
+     onmouseover="return searchBox.OnSearchSelectShow()"
+     onmouseout="return searchBox.OnSearchSelectHide()"
+     onkeydown="return searchBox.OnSearchSelectKey(event)">
+</div>
+
+<!-- iframe showing the search results (closed by default) -->
+<div id="MSearchResultsWindow">
+<iframe src="javascript:void(0)" frameborder="0" 
+        name="MSearchResults" id="MSearchResults">
+</iframe>
+</div>
+
+</div><!-- top -->
+<div class="header">
+  <div class="summary">
+<a href="#func-members">Funciones</a>  </div>
+  <div class="headertitle">
+<div class="title">Referencia del Archivo ejercicio8.c</div>  </div>
+</div><!--header-->
+<div class="contents">
+
+<p>Fuente del ejercicio 8 Este programa pide al usuario un número de procesos y un número de vueltas, estos procesos se pasarán una señal tantas vueltas como pida el usuario. Cada vez que uno la recibe, imprime la hora. Finalmente se acaban uno a uno.  
+<a href="#details">Más...</a></p>
+<div class="textblock"><code>#include &lt;stdio.h&gt;</code><br />
+<code>#include &lt;stdlib.h&gt;</code><br />
+<code>#include &lt;string.h&gt;</code><br />
+<code>#include &lt;signal.h&gt;</code><br />
+<code>#include &lt;unistd.h&gt;</code><br />
+<code>#include &lt;sys/types.h&gt;</code><br />
+<code>#include &lt;sys/wait.h&gt;</code><br />
+<code>#include &lt;fcntl.h&gt;</code><br />
+<code>#include &lt;time.h&gt;</code><br />
+</div><div class="textblock"><div class="dynheader">
+Dependencia gráfica adjunta para ejercicio8.c:</div>
+<div class="dyncontent">
+<div class="center"><img src="ejercicio8_8c__incl.png" border="0" usemap="#ejercicio8_8c" alt=""/></div>
+<map name="ejercicio8_8c" id="ejercicio8_8c">
+</map>
+</div>
+</div><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
+Funciones</h2></td></tr>
+<tr class="memitem:a445d4e4144b10aa987da413343200688"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a445d4e4144b10aa987da413343200688"></a>
+char *&#160;</td><td class="memItemRight" valign="bottom"><b>tiempo</b> ()</td></tr>
+<tr class="separator:a445d4e4144b10aa987da413343200688"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a54e0d453acd2cb0d8adfd611e4158462"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a54e0d453acd2cb0d8adfd611e4158462"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>manejador_sigusr1</b> (int sig)</td></tr>
+<tr class="separator:a54e0d453acd2cb0d8adfd611e4158462"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7e0d11f7ea2fd257c747e1cea963f357"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a7e0d11f7ea2fd257c747e1cea963f357"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>manejador_sigterm</b> (int sig)</td></tr>
+<tr class="separator:a7e0d11f7ea2fd257c747e1cea963f357"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0ddf1224851353fc92bfbff6f499fa97"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a0ddf1224851353fc92bfbff6f499fa97"></a>
+int&#160;</td><td class="memItemRight" valign="bottom"><b>main</b> (int argc, char *argv[])</td></tr>
+<tr class="separator:a0ddf1224851353fc92bfbff6f499fa97"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table>
+<a name="details" id="details"></a><h2 class="groupheader">Descripción detallada</h2>
+<div class="textblock"><p>Fuente del ejercicio 8 Este programa pide al usuario un número de procesos y un número de vueltas, estos procesos se pasarán una señal tantas vueltas como pida el usuario. Cada vez que uno la recibe, imprime la hora. Finalmente se acaban uno a uno. </p>
+<dl class="section author"><dt>Autor</dt><dd>Juan Riera Gomez (<a href="#" onclick="location.href='mai'+'lto:'+'jua'+'n.'+'rie'+'ra'+'@es'+'tu'+'dia'+'nt'+'e.u'+'am'+'.es'; return false;">juan.<span style="display: none;">.nosp@m.</span>rier<span style="display: none;">.nosp@m.</span>a@est<span style="display: none;">.nosp@m.</span>udia<span style="display: none;">.nosp@m.</span>nte.u<span style="display: none;">.nosp@m.</span>am.e<span style="display: none;">.nosp@m.</span>s</a>) y Carlos Ignacio Isasa Martín (<a href="#" onclick="location.href='mai'+'lto:'+'car'+'lo'+'s.i'+'sa'+'sa@'+'es'+'tud'+'ia'+'nte'+'.u'+'am.'+'es'; return false;">carlo<span style="display: none;">.nosp@m.</span>s.is<span style="display: none;">.nosp@m.</span>asa@e<span style="display: none;">.nosp@m.</span>stud<span style="display: none;">.nosp@m.</span>iante<span style="display: none;">.nosp@m.</span>.uam<span style="display: none;">.nosp@m.</span>.es</a>) </dd></dl>
+<dl class="section version"><dt>Versión</dt><dd>1.0 </dd></dl>
+<dl class="section date"><dt>Fecha</dt><dd>15-03-2017 </dd></dl>
+</div></div><!-- contents -->
+<!-- start footer part -->
+<hr class="footer"/><address class="footer"><small>
+Generado por &#160;<a href="http://www.doxygen.org/index.html">
+<img class="footer" src="doxygen.png" alt="doxygen"/>
+</a> 1.8.11
+</small></address>
+</body>
+</html>

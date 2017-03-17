@@ -1,0 +1,65 @@
+\hypertarget{ejercicio10_8c}{}\section{Referencia del Archivo ejercicio10.\+c}
+\label{ejercicio10_8c}\index{ejercicio10.\+c@{ejercicio10.\+c}}
+
+
+Fuente del ejercicio 10.  
+
+
+{\ttfamily \#include $<$stdio.\+h$>$}\\*
+{\ttfamily \#include $<$stdlib.\+h$>$}\\*
+{\ttfamily \#include $<$string.\+h$>$}\\*
+{\ttfamily \#include $<$signal.\+h$>$}\\*
+{\ttfamily \#include $<$unistd.\+h$>$}\\*
+{\ttfamily \#include $<$sys/types.\+h$>$}\\*
+{\ttfamily \#include $<$sys/wait.\+h$>$}\\*
+{\ttfamily \#include $<$fcntl.\+h$>$}\\*
+{\ttfamily \#include $<$time.\+h$>$}\\*
+Dependencia gráfica adjunta para ejercicio10.\+c\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{ejercicio10_8c__incl}
+\end{center}
+\end{figure}
+\subsection*{\textquotesingle{}defines\textquotesingle{}}
+\begin{DoxyCompactItemize}
+\item 
+\#define {\bfseries M\+A\+X\+B\+UF}~256\hypertarget{ejercicio10_8c_ad7871643c05865c80f5d8050aead2b57}{}\label{ejercicio10_8c_ad7871643c05865c80f5d8050aead2b57}
+
+\end{DoxyCompactItemize}
+\subsection*{Funciones}
+\begin{DoxyCompactItemize}
+\item 
+void \hyperlink{ejercicio10_8c_aae89ff4f81b8ee890b1a41ed2a2fab23}{manejador\+\_\+sigalrm} (int sig)
+\item 
+int {\bfseries main} ()\hypertarget{ejercicio10_8c_ae66f6b31b5ad750f1fe042a706a4e3d4}{}\label{ejercicio10_8c_ae66f6b31b5ad750f1fe042a706a4e3d4}
+
+\end{DoxyCompactItemize}
+
+
+\subsection{Descripción detallada}
+Fuente del ejercicio 10. 
+
+El programa ejercicio10 ejercutará un fork, del resultado del cual el hijo escribirá en un fichero una palabra aleatoria de la frase del enunciado, y si escribe la palabra \char`\"{}\+F\+I\+N\char`\"{} termina su ejecución. El padre esperará 5 segundos y leerá una palabra, si ésta es \char`\"{}\+F\+I\+N\char`\"{}, entenderá que su hijo ha terminado y lo reanimará. Si no, continuará. Este proceso se ejecuta 50 veces.
+
+\begin{DoxyAuthor}{Autor}
+Juan Riera Gomez (\href{mailto:juan.riera@estudiante.uam.es}{\tt juan.\+riera@estudiante.\+uam.\+es}) y Carlos Ignacio Isasa Martín (\href{mailto:carlos.isasa@estudiante.uam.es}{\tt carlos.\+isasa@estudiante.\+uam.\+es}) 
+\end{DoxyAuthor}
+\begin{DoxyVersion}{Versión}
+1.\+0 
+\end{DoxyVersion}
+\begin{DoxyDate}{Fecha}
+15-\/03-\/2017 
+\end{DoxyDate}
+
+
+\subsection{Documentación de las funciones}
+\index{ejercicio10.\+c@{ejercicio10.\+c}!manejador\+\_\+sigalrm@{manejador\+\_\+sigalrm}}
+\index{manejador\+\_\+sigalrm@{manejador\+\_\+sigalrm}!ejercicio10.\+c@{ejercicio10.\+c}}
+\subsubsection[{\texorpdfstring{manejador\+\_\+sigalrm(int sig)}{manejador_sigalrm(int sig)}}]{\setlength{\rightskip}{0pt plus 5cm}void manejador\+\_\+sigalrm (
+\begin{DoxyParamCaption}
+\item[{int}]{sig}
+\end{DoxyParamCaption}
+)}\hypertarget{ejercicio10_8c_aae89ff4f81b8ee890b1a41ed2a2fab23}{}\label{ejercicio10_8c_aae89ff4f81b8ee890b1a41ed2a2fab23}
+Este es el manejador de la señal de alarma de reloj (S\+I\+G\+A\+L\+RM)i que no tiene nada, ya que nos interesa que simplemente espere a la llegada de la señal y continúe su ejecución. 

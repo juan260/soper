@@ -1,0 +1,66 @@
+\hypertarget{ejercicio4_8c}{}\section{Referencia del Archivo ejercicio4.\+c}
+\label{ejercicio4_8c}\index{ejercicio4.\+c@{ejercicio4.\+c}}
+
+
+Fuente del ejercicio 4 Este programa pide al usuario dos matrices y dos factores para multiplicarlas. Multiplica cada una por un factor en dos hilos distintos que además mantienen una comunicación para saber por donde va el otro.  
+
+
+{\ttfamily \#include $<$stdio.\+h$>$}\\*
+{\ttfamily \#include $<$stdlib.\+h$>$}\\*
+{\ttfamily \#include $<$unistd.\+h$>$}\\*
+{\ttfamily \#include $<$string.\+h$>$}\\*
+{\ttfamily \#include $<$pthread.\+h$>$}\\*
+Dependencia gráfica adjunta para ejercicio4.\+c\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{ejercicio4_8c__incl}
+\end{center}
+\end{figure}
+\subsection*{Estructuras de datos}
+\begin{DoxyCompactItemize}
+\item 
+struct \hyperlink{structmatrix}{matrix}
+\end{DoxyCompactItemize}
+\subsection*{\textquotesingle{}typedefs\textquotesingle{}}
+\begin{DoxyCompactItemize}
+\item 
+typedef struct \hyperlink{structmatrix}{matrix} {\bfseries Matrix}\hypertarget{ejercicio4_8c_a9a1246023f40a820ce7ac97a61b8d4e0}{}\label{ejercicio4_8c_a9a1246023f40a820ce7ac97a61b8d4e0}
+
+\end{DoxyCompactItemize}
+\subsection*{Funciones}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{structmatrix}{Matrix} $\ast$ {\bfseries matrix\+\_\+create} (int dim, int mul1, int mul2, char $\ast$matrix1, char $\ast$matrix2)\hypertarget{ejercicio4_8c_aff8a75e7d6bcd60ae075774d9f6094d0}{}\label{ejercicio4_8c_aff8a75e7d6bcd60ae075774d9f6094d0}
+
+\item 
+void {\bfseries matrix\+\_\+print} (\hyperlink{structmatrix}{Matrix} $\ast$m)\hypertarget{ejercicio4_8c_a61925e6538cbcdb2d1be0455df31078d}{}\label{ejercicio4_8c_a61925e6538cbcdb2d1be0455df31078d}
+
+\item 
+void {\bfseries matrix\+\_\+free} (\hyperlink{structmatrix}{Matrix} $\ast$m)\hypertarget{ejercicio4_8c_a8e7cf1507ce317450f07737f4c5c6638}{}\label{ejercicio4_8c_a8e7cf1507ce317450f07737f4c5c6638}
+
+\item 
+void $\ast$ {\bfseries first\+\_\+matrix} (void $\ast$\hyperlink{structmatrix}{matrix})\hypertarget{ejercicio4_8c_a2447e77b228ae6cce3c32c6769557fc4}{}\label{ejercicio4_8c_a2447e77b228ae6cce3c32c6769557fc4}
+
+\item 
+void $\ast$ {\bfseries second\+\_\+matrix} (void $\ast$\hyperlink{structmatrix}{matrix})\hypertarget{ejercicio4_8c_a447c6f40c750f2662ca19c510951ac6c}{}\label{ejercicio4_8c_a447c6f40c750f2662ca19c510951ac6c}
+
+\item 
+int {\bfseries main} ()\hypertarget{ejercicio4_8c_ae66f6b31b5ad750f1fe042a706a4e3d4}{}\label{ejercicio4_8c_ae66f6b31b5ad750f1fe042a706a4e3d4}
+
+\end{DoxyCompactItemize}
+
+
+\subsection{Descripción detallada}
+Fuente del ejercicio 4 Este programa pide al usuario dos matrices y dos factores para multiplicarlas. Multiplica cada una por un factor en dos hilos distintos que además mantienen una comunicación para saber por donde va el otro. 
+
+\begin{DoxyAuthor}{Autor}
+Juan Riera Gomez (\href{mailto:juan.riera@estudiante.uam.es}{\tt juan.\+riera@estudiante.\+uam.\+es}) y Carlos Ignacio Isasa Martín (\href{mailto:carlos.isasa@estudiante.uam.es}{\tt carlos.\+isasa@estudiante.\+uam.\+es}) 
+\end{DoxyAuthor}
+\begin{DoxyVersion}{Versión}
+1.\+0 
+\end{DoxyVersion}
+\begin{DoxyDate}{Fecha}
+14-\/03-\/2017 
+\end{DoxyDate}

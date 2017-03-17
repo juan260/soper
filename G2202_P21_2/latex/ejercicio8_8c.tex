@@ -1,0 +1,53 @@
+\hypertarget{ejercicio8_8c}{}\section{Referencia del Archivo ejercicio8.\+c}
+\label{ejercicio8_8c}\index{ejercicio8.\+c@{ejercicio8.\+c}}
+
+
+Fuente del ejercicio 8 Este programa pide al usuario un número de procesos y un número de vueltas, estos procesos se pasarán una señal tantas vueltas como pida el usuario. Cada vez que uno la recibe, imprime la hora. Finalmente se acaban uno a uno.  
+
+
+{\ttfamily \#include $<$stdio.\+h$>$}\\*
+{\ttfamily \#include $<$stdlib.\+h$>$}\\*
+{\ttfamily \#include $<$string.\+h$>$}\\*
+{\ttfamily \#include $<$signal.\+h$>$}\\*
+{\ttfamily \#include $<$unistd.\+h$>$}\\*
+{\ttfamily \#include $<$sys/types.\+h$>$}\\*
+{\ttfamily \#include $<$sys/wait.\+h$>$}\\*
+{\ttfamily \#include $<$fcntl.\+h$>$}\\*
+{\ttfamily \#include $<$time.\+h$>$}\\*
+Dependencia gráfica adjunta para ejercicio8.\+c\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{ejercicio8_8c__incl}
+\end{center}
+\end{figure}
+\subsection*{Funciones}
+\begin{DoxyCompactItemize}
+\item 
+char $\ast$ {\bfseries tiempo} ()\hypertarget{ejercicio8_8c_a445d4e4144b10aa987da413343200688}{}\label{ejercicio8_8c_a445d4e4144b10aa987da413343200688}
+
+\item 
+void {\bfseries manejador\+\_\+sigusr1} (int sig)\hypertarget{ejercicio8_8c_a54e0d453acd2cb0d8adfd611e4158462}{}\label{ejercicio8_8c_a54e0d453acd2cb0d8adfd611e4158462}
+
+\item 
+void {\bfseries manejador\+\_\+sigterm} (int sig)\hypertarget{ejercicio8_8c_a7e0d11f7ea2fd257c747e1cea963f357}{}\label{ejercicio8_8c_a7e0d11f7ea2fd257c747e1cea963f357}
+
+\item 
+int {\bfseries main} (int argc, char $\ast$argv\mbox{[}$\,$\mbox{]})\hypertarget{ejercicio8_8c_a0ddf1224851353fc92bfbff6f499fa97}{}\label{ejercicio8_8c_a0ddf1224851353fc92bfbff6f499fa97}
+
+\end{DoxyCompactItemize}
+
+
+\subsection{Descripción detallada}
+Fuente del ejercicio 8 Este programa pide al usuario un número de procesos y un número de vueltas, estos procesos se pasarán una señal tantas vueltas como pida el usuario. Cada vez que uno la recibe, imprime la hora. Finalmente se acaban uno a uno. 
+
+\begin{DoxyAuthor}{Autor}
+Juan Riera Gomez (\href{mailto:juan.riera@estudiante.uam.es}{\tt juan.\+riera@estudiante.\+uam.\+es}) y Carlos Ignacio Isasa Martín (\href{mailto:carlos.isasa@estudiante.uam.es}{\tt carlos.\+isasa@estudiante.\+uam.\+es}) 
+\end{DoxyAuthor}
+\begin{DoxyVersion}{Versión}
+1.\+0 
+\end{DoxyVersion}
+\begin{DoxyDate}{Fecha}
+15-\/03-\/2017 
+\end{DoxyDate}
