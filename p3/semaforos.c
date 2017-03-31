@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <errno.h>
 #include "semaforos.h"
 
 /***************************************************************
@@ -12,8 +13,14 @@ Salida:
 	int: OK si todo fue correcto, ERROR en caso de error.
 ************************************************************/
 int Inicializar_Semaforo(int semid, unsigned short *array){
-    
-
+	int i=0;
+	while((array+i)!=0){
+		if(semop(semctl,i, SETVAL,array[i])<0){
+			return ERROR;
+		}  		
+		i++;
+	}
+	return OK;
 }   
 
 /***************************************************************
@@ -24,7 +31,12 @@ Entrada:
 Salida:
 	int: OK si todo fue correcto, ERROR en caso de error.
 ***************************************************************/
-int Borrar_Semaforo(int semid);
+int Borrar_Semaforo(int semid){
+	if(semctl(semid,0,IPC_RMID)<0){
+		return ERROR;
+	}
+	return OK;
+}
 
 /***************************************************************
 Nombre: Crear_Semaforo.
@@ -39,10 +51,24 @@ Salida:
 		0 si ha creado el semaforo,
 		1 si ya estaba creado.
 **************************************************************/
-int Crear_Semaforo(key_t key, int size, int *semid);
+int Crear_Semaforo(key_t key, int size, int *semid){
+	int sem, ret;
+	sem = semget(key, size, IPC_CREAT | IPC_EXCL);
+	ret = 0;
+	if(sem==-1){
+		if(errno==EEXIST){
+			sem = semget(key, size, IPC_CREAT);
+			ret = 1;
+		if(sem==-1){
+			return ERROR;
+		}
+	semctl(sem,0,SETALL,0);
+	*semid=sem;	
+	return ret;
+}	
 
 /**************************************************************
-Nombre:Down_Semaforo
+Nombre: Down_Semaforo
 Descripcion: Baja el semaforo indicado
 Entrada:
 	int semid: Identificador del semaforo.
@@ -52,7 +78,8 @@ Entrada:
 Salida:
 	int: OK si todo fue correcto, ERROR en caso de error.
 ***************************************************************/
-int Down_Semaforo(int id, int num_sem, int undo);
+int Down_Semaforo(int id, int num_sem, int undo){
+
 
 /***************************************************************
 Nombre: DownMultiple_Semaforo

@@ -4,6 +4,7 @@
 #include <sys/ipc.h>
 #define OK 0
 #define ERROR -1
+
 /***************************************************************
 Nombre: Inicializar_Semaforo.
 Descripcion: Inicializa los semaforos indicados.
