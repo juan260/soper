@@ -13,7 +13,7 @@
 #define PROJID 1300
 /* Este define sirve para limitar la cantidad de tiempo aleatorio 
 que esperael proceso hijo (Ya que podria ser demasiado alto) */
-#define MAXUSEC 10000
+#define MAXUSEC 10
 
 typedef struct _info{
     char nombre[80];
@@ -30,7 +30,7 @@ void handler_sigusr1(){
 }
 
 int main(int argc, char * argv[]){
-    int N, id, sid, key;
+    int N, id, sid, key, i;
     Info *info;  
     char buffer[MAXBUF];
     time_t t;   
@@ -66,36 +66,29 @@ int main(int argc, char * argv[]){
         exit(EXIT_FAILURE);
     }
 
-    printf("\nVamos con el fork\n");
-    
-    id=fork();
-        if(signal(SIGUSR1,handler_sigusr1)==SIG_ERR){
-                perror("Error al ejecutar signal()");
-                        exit(EXIT_FAILURE);
-                            }
-
-    if(id<0){
-        perror("Error al hacer fork.\n");
-        while(wait(NULL)>=0){} 
-        exit(EXIT_SUCCESS);
+    for(i=0;i<N;i++){
+    	id=fork();
+   	if(id<0){
+        	perror("Error al hacer fork.\n");
+        	while(wait(NULL)>=0){} 
+        	exit(EXIT_SUCCESS);
         
-    } else if(id>0) {
-        /* Estamos en el proceso hijo */
-        info = shmat(sid, NULL, 0);
-        printf("Esperando\n");
-        usleep(rand()%MAXUSEC);
-        printf("\nIntroduzca el nombre de un cliente: ");
-        scanf("%s", buffer);
+    	} else if(id==0) {
+        	/* Estamos en el proceso hijo */
+        	info = shmat(sid, NULL, 0);
+		sleep(rand()%MAXUSEC);
+        	printf("\nIntroduzca el nombre de un cliente: ");
+        	scanf("%s", buffer);
             
-        info->id++;
-        strcpy(info->nombre, buffer);
+        	info->id++;
+        	strcpy(info->nombre, buffer);
 
-        kill(getppid(), SIGUSR1);
-        shmdt((Info*)info);
-        shmctl(sid, IPC_RMID, (struct shmid_ds*)NULL); 
-        exit(EXIT_SUCCESS);
-    }
-
+        	kill(getppid(), SIGUSR1);
+        	shmdt((Info*)info);
+        	shmctl(sid, IPC_RMID, (struct shmid_ds*)NULL); 
+        	exit(EXIT_SUCCESS);
+    	}
+	}
     while(wait(NULL)>=0){}
     shmctl(sid, IPC_RMID, (struct shmid_ds*)NULL);
     exit(EXIT_SUCCESS);
