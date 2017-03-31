@@ -2,6 +2,7 @@
 #define SEMAFOROS_H
 #include <sys/types.h>
 #include <sys/ipc.h>
+#include <sys/sem.h>
 #define OK 0
 #define ERROR -1
 
