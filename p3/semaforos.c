@@ -79,7 +79,7 @@ int Crear_Semaforo(key_t key, int size, int *semid){
         Borrar_Semaforo(sem);
         perror("Error en la creacion del semaforo\n");
         return ERROR;
-        }
+    }
 
     for(i=0;i<size;i++){
         array[i]=0;
@@ -90,7 +90,8 @@ int Crear_Semaforo(key_t key, int size, int *semid){
 	    return ERROR;
     }
     *semid=sem;	
-	return ret;
+	free(array);
+    return ret;
 }	
 
 /**************************************************************
