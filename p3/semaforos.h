@@ -1,8 +1,16 @@
 #ifndef SEMAFOROS_H
 #define SEMAFOROS_H
+#include <stdio.h>
+#include <stdlib.h>
+#include <sys/shm.h>
+#include <signal.h>
+#include <sys/wait.h>
+#include <errno.h>
+#include <string.h>
 #include <sys/types.h>
 #include <sys/ipc.h>
 #include <sys/sem.h>
+
 #define OK 0
 #define ERROR -1
 

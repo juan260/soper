@@ -13,7 +13,7 @@
 #define PROJID 1300
 /* Este define sirve para limitar la cantidad de tiempo aleatorio 
 que esperael proceso hijo (Ya que podria ser demasiado alto) */
-#define MAXUSEC 10
+#define MAXUSEC 10000
 
 typedef struct _info{
     char nombre[80];
@@ -76,7 +76,7 @@ int main(int argc, char * argv[]){
     	} else if(id==0) {
         	/* Estamos en el proceso hijo */
         	info = shmat(sid, NULL, 0);
-		sleep(rand()%MAXUSEC);
+		    usleep(rand()%MAXUSEC);
         	printf("\nIntroduzca el nombre de un cliente: ");
         	scanf("%s", buffer);
             
