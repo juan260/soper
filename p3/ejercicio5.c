@@ -165,7 +165,16 @@ int main(){
             exit(EXIT_FAILURE);
         }
     }
-
+    
+    /* Probamos ahora Up multiple */
+    printf("Probando Up multiple.\n");
+    
+    /* Probamos ahora a hacer down a una serie de semaforos */
+    printf("Probando la instrucción down.\n");
+    
+    /* Probamos ahora down multiple */
+    printf("Probando down multiple");
+    /* Probamos el borrado de los semáforos y terminamos la ejecución */
     printf("Probando el borrado de semáforos.\n");
     if(Borrar_Semaforo(semid)==ERROR){
         perror("Fallo en el borrado del semáforo");
@@ -173,7 +182,7 @@ int main(){
         exit(EXIT_FAILURE);
     }
     
-    printf("Test completado.\n\n");
+    printf("Test completado satisfactoriamente.\n\n");
     free(arg1.array);
     exit(EXIT_SUCCESS);
 }
