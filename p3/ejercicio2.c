@@ -35,8 +35,6 @@ int main(int argc, char * argv[]){
     char buffer[MAXBUF];
     time_t t;   
     
-    /* Cambiamos la semilla de rand() */
-    srand(time(&t));
 
     if(argc!=2){
         printf("Error en los argumentos de entrada."
@@ -61,6 +59,12 @@ int main(int argc, char * argv[]){
     
     info = shmat(sid, NULL, 0);
     
+    if(info == (void*)-1){
+        perror("Error al obtener la variable de memoria compartida.\n");
+        shmctl(sid, IPC_RMID, (struct shmid_ds*)NULL);            
+        exit(EXIT_FAILURE);
+    }
+
     if(info==NULL){
         perror("Error al reservar la memoria compartida.\n");
         exit(EXIT_FAILURE);
@@ -75,7 +79,14 @@ int main(int argc, char * argv[]){
         
     	} else if(id==0) {
         	/* Estamos en el proceso hijo */
-        	info = shmat(sid, NULL, 0);
+            /* Le damos una semilla distinta a cada proceso hijo */
+        	srand(time(&t)*getpid());
+
+            info = shmat(sid, NULL, 0);
+            if(info == (void *)-1){
+                perror("Error al obtener la variable de memoria compartida.\n");
+                exit(EXIT_FAILURE);
+            }
 		    usleep(rand()%MAXUSEC);
         	printf("\nIntroduzca el nombre de un cliente: ");
         	scanf("%s", buffer);
@@ -83,14 +94,29 @@ int main(int argc, char * argv[]){
         	info->id++;
         	strcpy(info->nombre, buffer);
 
-        	kill(getppid(), SIGUSR1);
-        	shmdt((Info*)info);
-        	shmctl(sid, IPC_RMID, (struct shmid_ds*)NULL); 
-        	exit(EXIT_SUCCESS);
+        	if(kill(getppid(), SIGUSR1)==-1){
+                perror("Error al enviar la señal SIGUSR1");
+            }
+
+        	if(shmdt((Info*)info)==-1){
+                perror("Error al liberar la variable de memoria compartida");
+                shmctl(sid, IPC_RMID, (struct shmid_ds*)NULL);
+                exit(EXIT_FAILURE);
+            }
+
+            if(shmctl(sid, IPC_RMID, (struct shmid_ds*)NULL)==-1){
+                perror("Error al eliminar la memoria compartida.\n");
+                exit(EXIT_FAILURE);
+            }   
+	
+            exit(EXIT_SUCCESS);
     	}
 	}
     while(wait(NULL)>=0){}
-    shmctl(sid, IPC_RMID, (struct shmid_ds*)NULL);
+    if(shmctl(sid, IPC_RMID, (struct shmid_ds*)NULL)==-1){
+        perror("Error al eliminar la memoria compartida.\n");
+        exit(EXIT_FAILURE);
+    }
     exit(EXIT_SUCCESS);
 
     
