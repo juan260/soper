@@ -9,7 +9,7 @@
 
 int main(){
     
-    int error, semid, ret, key, i;
+    int error, semid, ret, key, i, activeArray[SEMNUM];
     
     short unsigned int array[SEMNUM];
     union semun {
@@ -133,6 +133,7 @@ int main(){
     }
     
     printf("Probando a hacer up de otro semáforo.\n");
+
     if(Up_Semaforo(semid, 1, SEM_UNDO)==ERROR){
         perror("Error al hacer up del semáforo 1 del array.\n");
         free(arg1.array);
@@ -168,9 +169,46 @@ int main(){
     
     /* Probamos ahora Up multiple */
     printf("Probando Up multiple.\n");
+
+    for(i=0;i<SEMNUM;i++){
+        activeArray[i]=i;
+    }
+
+    if(UpMultiple_Semaforo(semid, SEMNUM, SEM_UNDO, activeArray)==ERROR){
+        perror("Error al hacer up múltiple del semáforo.\n");
+        free(arg1.array);
+        Borrar_Semaforo(semid);
+        exit(EXIT_FAILURE);
+    }
     
-    /* Probamos ahora a hacer down a una serie de semaforos */
-    printf("Probando la instrucción down.\n");
+ 
+    printf("Comprobando que el semáforo tiene los valores correctos.\n");
+    if(semctl(semid, 0, GETALL, arg1)==-1){
+        perror("Error al obtener valores.\n");
+        free(arg1.array);
+        Borrar_Semaforo(semid);
+        exit(EXIT_FAILURE);
+    } 
+        /* Empezamos comprobando los dos semáforos que hemos cambiado */
+    if(arg1.array[0]!=4||arg1.array[1]!=2||arg1.array[2]!=6){
+        printf("Fallo al hacer los up's.\n");
+        free(arg1.array);
+        Borrar_Semaforo(semid);
+        exit(EXIT_FAILURE);
+    }
+
+    /* Ahora comprobamos el resto */
+    for(i=3;i<SEMNUM;i++){
+        if(arg1.array[i]!=1){
+            printf("El semaforo %d no está bien inicializado, tenia el valor %hu\n", i, arg1.array[i]);
+            free(arg1.array);
+            Borrar_Semaforo(semid);
+            exit(EXIT_FAILURE);
+        }
+    }
+   
+    /* Probamos ahora a hacer down multiples semaforos */
+    printf("Probando la instrucción downMultiple.\n");
     
     /* Probamos ahora down multiple */
     printf("Probando down multiple");

@@ -20,7 +20,6 @@ typedef struct _info{
     int id;
 }Info;
 
-        
 void  handler_sigusr1(){
     int key, sid;
     Info * info;
@@ -90,18 +89,18 @@ int main(int argc, char * argv[]){
             /* Le damos una semilla distinta a cada proceso hijo */
             srand(time(&t)*getpid());
              
-            if((sid = shmget(key, sizeof(Info), 
-                IPC_CREAT | SHM_R | SHM_W))==-1){
-                perror("Error al obtener la zona compartida de memoria.\n");
-                exit(EXIT_SUCCESS);
-            }
+        if((sid = shmget(key, sizeof(Info), 
+            IPC_CREAT | SHM_R | SHM_W))==-1){
+            perror("Error al obtener la zona compartida de memoria.\n");
+            exit(EXIT_SUCCESS);
+        }
     
-            info = shmat(sid, NULL, 0);
-            if(info == (void *)-1){
-                perror("Error  al obtener la variable de memoria compartida.\n");
-                exit(EXIT_FAILURE);
-            }
-            usleep(rand()%MAXUSEC);
+        info = shmat(sid, NULL, 0);
+        if(info == (void *)-1){
+            perror("Error  al obtener la variable de memoria compartida.\n");
+            exit(EXIT_FAILURE);
+        }
+        usleep(rand()%MAXUSEC);
             printf("\nIntroduzca el nombre de un cliente: ");
             scanf("%s", buffer);
             
