@@ -1,3 +1,15 @@
+/**
+* @brief Fuente del ejercicio 6
+*
+* En este programa se simula el problema clásico del productor-consumidor, un proceso "produce" (escribe en una
+* memoria compartida) y otro "consume" lo que se ha prducido (lee de la memoria compartida lo que ha escrito el
+* productor)
+* @file ejercicio6.c
+* @author Juan Riera Gomez (juan.riera@estudiante.uam.es) y Carlos Ignacio Isasa Martín (carlos.isasa@estudiante.uam.es)
+* @version 1.0
+* @date 07-abril-2017
+*/
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/ipc.h>
