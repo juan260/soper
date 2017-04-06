@@ -1,0 +1,59 @@
+\hypertarget{semaforos_8c}{}\section{Referencia del Archivo semaforos.\+c}
+\label{semaforos_8c}\index{semaforos.\+c@{semaforos.\+c}}
+
+
+Fuente del ejercicio 4.  
+
+
+{\ttfamily \#include $<$stdio.\+h$>$}\\*
+{\ttfamily \#include $<$stdlib.\+h$>$}\\*
+{\ttfamily \#include $<$errno.\+h$>$}\\*
+{\ttfamily \#include \char`\"{}semaforos.\+h\char`\"{}}\\*
+Dependencia gráfica adjunta para semaforos.\+c\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{semaforos_8c__incl}
+\end{center}
+\end{figure}
+\subsection*{Funciones}
+\begin{DoxyCompactItemize}
+\item 
+int {\bfseries Inicializar\+\_\+\+Semaforo} (int semid, unsigned short $\ast$array)\hypertarget{semaforos_8c_a4af104b0ed37e6ae0289a1059bc6e990}{}\label{semaforos_8c_a4af104b0ed37e6ae0289a1059bc6e990}
+
+\item 
+int {\bfseries Borrar\+\_\+\+Semaforo} (int semid)\hypertarget{semaforos_8c_a731339337960a681efa435a10f12c312}{}\label{semaforos_8c_a731339337960a681efa435a10f12c312}
+
+\item 
+int {\bfseries Crear\+\_\+\+Semaforo} (key\+\_\+t key, int size, int $\ast$semid)\hypertarget{semaforos_8c_a16b16dd895b5f4cbe48f1ac8977e8b35}{}\label{semaforos_8c_a16b16dd895b5f4cbe48f1ac8977e8b35}
+
+\item 
+int {\bfseries Down\+\_\+\+Semaforo} (int id, int num\+\_\+sem, int undo)\hypertarget{semaforos_8c_a883244cd3b83c42cda23687da1b63369}{}\label{semaforos_8c_a883244cd3b83c42cda23687da1b63369}
+
+\item 
+int {\bfseries Down\+Multiple\+\_\+\+Semaforo} (int id, int size, int undo, int $\ast$active)\hypertarget{semaforos_8c_ab375ebfc38acbdced46e062a689d5fad}{}\label{semaforos_8c_ab375ebfc38acbdced46e062a689d5fad}
+
+\item 
+int {\bfseries Up\+\_\+\+Semaforo} (int id, int num\+\_\+sem, int undo)\hypertarget{semaforos_8c_a2d5e735aecee4f493898b3d4ebab1a10}{}\label{semaforos_8c_a2d5e735aecee4f493898b3d4ebab1a10}
+
+\item 
+int {\bfseries Up\+Multiple\+\_\+\+Semaforo} (int id, int size, int undo, int $\ast$active)\hypertarget{semaforos_8c_a943759695f018d64a94b8a2c49308092}{}\label{semaforos_8c_a943759695f018d64a94b8a2c49308092}
+
+\end{DoxyCompactItemize}
+
+
+\subsection{Descripción detallada}
+Fuente del ejercicio 4. 
+
+En este fuente se implementa la librería de semáforos propuesta en el enunciado.
+
+\begin{DoxyAuthor}{Autor}
+Juan Riera Gomez (\href{mailto:juan.riera@estudiante.uam.es}{\tt juan.\+riera@estudiante.\+uam.\+es}) y Carlos Ignacio Isasa Martín (\href{mailto:carlos.isasa@estudiante.uam.es}{\tt carlos.\+isasa@estudiante.\+uam.\+es}) 
+\end{DoxyAuthor}
+\begin{DoxyVersion}{Versión}
+1.\+0 
+\end{DoxyVersion}
+\begin{DoxyDate}{Fecha}
+06-\/abril-\/2017 
+\end{DoxyDate}

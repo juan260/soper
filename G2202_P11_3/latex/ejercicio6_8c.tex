@@ -1,0 +1,58 @@
+\hypertarget{ejercicio6_8c}{}\section{Referencia del Archivo ejercicio6.\+c}
+\label{ejercicio6_8c}\index{ejercicio6.\+c@{ejercicio6.\+c}}
+
+
+Fuente del ejercicio 6.  
+
+
+{\ttfamily \#include $<$stdio.\+h$>$}\\*
+{\ttfamily \#include $<$stdlib.\+h$>$}\\*
+{\ttfamily \#include $<$sys/ipc.\+h$>$}\\*
+{\ttfamily \#include $<$sys/shm.\+h$>$}\\*
+{\ttfamily \#include $<$sys/types.\+h$>$}\\*
+{\ttfamily \#include $<$unistd.\+h$>$}\\*
+{\ttfamily \#include $<$signal.\+h$>$}\\*
+{\ttfamily \#include $<$sys/wait.\+h$>$}\\*
+{\ttfamily \#include $<$errno.\+h$>$}\\*
+{\ttfamily \#include $<$time.\+h$>$}\\*
+{\ttfamily \#include $<$string.\+h$>$}\\*
+{\ttfamily \#include \char`\"{}semaforos.\+h\char`\"{}}\\*
+Dependencia gráfica adjunta para ejercicio6.\+c\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{ejercicio6_8c__incl}
+\end{center}
+\end{figure}
+\subsection*{\textquotesingle{}defines\textquotesingle{}}
+\begin{DoxyCompactItemize}
+\item 
+\#define {\bfseries M\+A\+X\+B\+UF}~26\hypertarget{ejercicio6_8c_ad7871643c05865c80f5d8050aead2b57}{}\label{ejercicio6_8c_ad7871643c05865c80f5d8050aead2b57}
+
+\item 
+\#define {\bfseries P\+R\+O\+J\+ID}~1300\hypertarget{ejercicio6_8c_a489440928d1b279bb8bdc0bb2ccd414f}{}\label{ejercicio6_8c_a489440928d1b279bb8bdc0bb2ccd414f}
+
+\end{DoxyCompactItemize}
+\subsection*{Funciones}
+\begin{DoxyCompactItemize}
+\item 
+int {\bfseries main} (int argc, char $\ast$argv\mbox{[}$\,$\mbox{]})\hypertarget{ejercicio6_8c_a0ddf1224851353fc92bfbff6f499fa97}{}\label{ejercicio6_8c_a0ddf1224851353fc92bfbff6f499fa97}
+
+\end{DoxyCompactItemize}
+
+
+\subsection{Descripción detallada}
+Fuente del ejercicio 6. 
+
+En este programa se simula el problema clásico del productor-\/consumidor, un proceso \char`\"{}produce\char`\"{} (escribe en una memoria compartida) y otro \char`\"{}consume\char`\"{} lo que se ha prducido (lee de la memoria compartida lo que ha escrito el productor)
+
+\begin{DoxyAuthor}{Autor}
+Juan Riera Gomez (\href{mailto:juan.riera@estudiante.uam.es}{\tt juan.\+riera@estudiante.\+uam.\+es}) y Carlos Ignacio Isasa Martín (\href{mailto:carlos.isasa@estudiante.uam.es}{\tt carlos.\+isasa@estudiante.\+uam.\+es}) 
+\end{DoxyAuthor}
+\begin{DoxyVersion}{Versión}
+1.\+0 
+\end{DoxyVersion}
+\begin{DoxyDate}{Fecha}
+07-\/abril-\/2017 
+\end{DoxyDate}
