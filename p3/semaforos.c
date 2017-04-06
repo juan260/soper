@@ -110,7 +110,6 @@ int Down_Semaforo(int id, int num_sem, int undo){
 	sem_oper.sem_num = num_sem;
 	sem_oper.sem_op =-1; 
 	sem_oper.sem_flg = undo; 
-	semop (id, &sem_oper, 1);
 	if(semop (id, &sem_oper, 1)==-1){
   	        return ERROR;
         }

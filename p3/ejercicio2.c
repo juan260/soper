@@ -1,3 +1,25 @@
+ /**
+ * @brief Fuente del ejercicio 2
+ *
+ * Este programa reserva una zona dememoria compartida, y crea una serie de hijos,
+ * tantos como se le indique por parámetros. Cada uno de los hijos altera la memoria 
+ * compartida, envia una señal al padre y termina. El padre por su parte cada vez
+ * que recibe esa señal, lee de la memoria compartida, imprime el contenido por 
+ * pantalla y termina. Cabe destacar que este ejercicio tiene un fallo en su
+ * planteamiento, al no controlar la concurrencia de ninguna manera.
+ *
+ * Para ejecutarse, se debe utilizar el comando:
+ *
+ * ./ejercicio2 N
+ *
+ * Donde N será el número de hijos a crear.
+ *
+ * @file ejercicio2.c
+ * @author Juan Riera Gomez (juan.riera@estudiante.uam.es) y Carlos Ignacio Isasa Martín (carlos.isasa@estudiante.uam.es)
+ * @version 1.0
+ * @date 06-abril-2017
+ */
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/ipc.h>
