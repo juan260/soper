@@ -17,12 +17,12 @@ int main(int argc, char* argv[]) {
     key_t keyMen, keyMem;
     int msqid, memid, ret1, ret2, *contadores, i, size;
     char buffer[4096];
-    
+
     if(argc!=3){
         perror("Error en los argumentos de entrada: Arg1 tiene que ser fichero origen y Arg2 tiene que ser fichero de destino");
         exit(EXIT_FAILURE);
     }
-    
+
     keyMen = ftok ("/bin/ls", 21);
     if (keyMen == (key_t) -1){
         perror("Error al obtener clave para cola mensajes\n");
@@ -34,14 +34,14 @@ int main(int argc, char* argv[]) {
         perror("Error al obtener clave para memoria compartida\n");
         exit(EXIT_FAILURE);
     }
-    
+
     msqid = msgget(keyMen, 0600|IPC_CREAT);
     if(msqid == -1){
     	perror("Error al obtener identificador de la cola de mensajes");
     	exit(EXIT_FAILURE);
     }
 
-    memid = shmget(keyMem, sizeof(int)*3, IPC_CREAT | SHM_R | SHM_W);
+    memid = shmget(keyMem, sizeof(int)*3, IPC_CREAT | IPC_EXCL|SHM_R | SHM_W);
     if(memid==-1){
     	perror("Error en la creación de memoria");
     	msgctl (msqid, IPC_RMID, (struct msqid_ds *)NULL);
@@ -92,6 +92,10 @@ int main(int argc, char* argv[]) {
     		}
     		contadores[0]=1;
     		fclose(f1);
+				if(shmdt(contadores)<0){
+					perror("Error al hacer detach.\n");
+					exit(EXIT_FAILURE);
+				}
     		exit(EXIT_SUCCESS);
     	}
     	else{
@@ -105,7 +109,7 @@ int main(int argc, char* argv[]) {
     				else{
     					buffer[i] = rcv.mensaje[i];
     				}
-    			} 
+    			}
     			send.mtype=2;
     			strcpy(send.mensaje, buffer);
     			msgsnd(msqid, (struct msgbuf*) &send, sizeof(Mensaje)-sizeof(long), 0);
@@ -113,6 +117,10 @@ int main(int argc, char* argv[]) {
     			contadores[2]++;
     		}
     		wait(NULL);
+				if(shmdt(contadores)<0){
+					perror("Error al hacer detach.\n");
+					exit(EXIT_FAILURE);
+				}
     		exit(EXIT_SUCCESS);
     	}
     }
@@ -125,10 +133,10 @@ int main(int argc, char* argv[]) {
 			shmctl (memid, IPC_RMID, (struct shmid_ds *)NULL);
 			msgctl (msqid, IPC_RMID, (struct msqid_ds *)NULL);
 			fclose(f2);
-    		exit(EXIT_FAILURE);		
+    		exit(EXIT_FAILURE);
     	}
     	while(contadores[0]!=1 || contadores[2]!=0){
-    		Mensaje rcv;    		
+    		Mensaje rcv;
     		msgrcv(msqid, (struct msgbuf*)&rcv, sizeof(Mensaje)-sizeof(long), 2, 0);
     		fflush(f2);
     		for(i=0; i<4096; i++){
@@ -147,4 +155,3 @@ int main(int argc, char* argv[]) {
     	exit(EXIT_SUCCESS);
     }
 }
-
