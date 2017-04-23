@@ -15,7 +15,7 @@ typedef struct Mensaje{
 
 int main(int argc, char* argv[]) {
     key_t keyMen, keyMem;
-    int msqid, memid, ret1, ret2, *contadores, i;
+    int msqid, memid, ret1, ret2, *contadores, i, size;
     char buffer[4096];
     
     if(argc!=3){
@@ -41,10 +41,11 @@ int main(int argc, char* argv[]) {
     	exit(EXIT_FAILURE);
     }
 
-    memid = shmget(keyMem, sizeof(int)*3, IPC_CREAT | IPC_EXCL | SHM_R | SHM_W);
+    memid = shmget(keyMem, sizeof(int)*3, IPC_CREAT | SHM_R | SHM_W);
     if(memid==-1){
     	perror("Error en la creación de memoria");
     	msgctl (msqid, IPC_RMID, (struct msqid_ds *)NULL);
+    	shmctl (memid, IPC_RMID, (struct shmid_ds *)NULL);
     	exit(EXIT_FAILURE);
     }
 
@@ -81,7 +82,10 @@ int main(int argc, char* argv[]) {
     			exit(EXIT_FAILURE);
     		}
     		send.mtype=1;
-    		while (fread(buffer, 1, 4096, f1)!=0){
+    		while ((size = fread(buffer, 1, 4096, f1)) !=0){
+    			if (size!=4096){
+    				buffer[size]=4;
+    			}
     			strcpy(send.mensaje, buffer);
     			msgsnd(msqid, (struct msgbuf*) &send, sizeof(Mensaje)-sizeof(long), 0);
     			contadores[1]++;
@@ -126,7 +130,13 @@ int main(int argc, char* argv[]) {
     	while(contadores[0]!=1 || contadores[2]!=0){
     		Mensaje rcv;    		
     		msgrcv(msqid, (struct msgbuf*)&rcv, sizeof(Mensaje)-sizeof(long), 2, 0);
-    		fprintf(f2, "%s", rcv.mensaje);
+    		fflush(f2);
+    		for(i=0; i<4096; i++){
+    			if(rcv.mensaje[i]==4){
+    				break;
+    			}
+    			fprintf(f2, "%c", rcv.mensaje[i]);
+    		}
     		contadores[2]--;
     	}
     	wait(NULL);
