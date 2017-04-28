@@ -3,11 +3,12 @@
 #include <unistd.h>
 #include "semaforos.h"
 #include "caballo.h"
+#include "monitor.h"
 #define MAXBUF 100
 #define PROJID 1245
 
-void argumentosEntrada(int argc, char * argv[], int * nCaballos, int * longCarrera,
-	int * nApostadores, int * nVentanillas){
+void argumentosEntrada(int argc, char * argv[], int * nCaballos,
+	int * longCarrera, int * nApostadores, int * nVentanillas){
 	if(argc != 5){
 		perror("Error en la entrada de argumentos.\n"
 			"El comando de entrada deberia ser:"
@@ -134,10 +135,11 @@ void freeVariablesCompartidas(int * sid){
 	}
 }
 
-void freeEverything(int semCaballos, int mutex, int ** pipePadreACaballo, int * sid){
+void freeEverything(int semCaballos, int mutex, int ** pipePadreACaballo,
+	int * sid, int nCaballos){
 	Borrar_Semaforo(semCaballos);
 	Borrar_Semaforo(mutex);
-	freePipesCaballos(pipePadreACaballo);
+	freePipesCaballos(pipePadreACaballo, nCaballos);
 	freeVariablesCompartidas(sid);
 }
 
@@ -224,7 +226,7 @@ int main(int argc, char * argv[]){
 	/* Ir bajando la variable tiempo de 15 a 0 */
 	if((tiempo = shmat(sid[0], NULL, 0))==(void*)-1){
 		perror("Error al obtener la zona compartida de memoria.\n");
-		freeEverything(semCaballos, mutex, pipePadreACaballo, sid);
+		freeEverything(semCaballos, mutex, pipePadreACaballo, sid, nCaballos);
 	}
 
 	carreraIniciada = 0;
@@ -232,7 +234,7 @@ int main(int argc, char * argv[]){
 		sleep(1);
 		if(Down_Semaforo(mutex, 0, SEM_UNDO)==ERROR){
 			perror("Error al hacer down del mutex.\n");
-			freeEverything(semCaballos, mutex, pipePadreACaballo, sid);
+			freeEverything(semCaballos, mutex, pipePadreACaballo, sid, nCaballos);
 		}
 		if(*tiempo>0){
 			*tiempo--;
@@ -241,7 +243,7 @@ int main(int argc, char * argv[]){
 		}
 		if(Up_Semaforo(mutex, 0, SEM_UNDO)==ERROR){
 			perror("Error al hacer up del mutex.\n");
-			freeEverything(semCaballos, mutex, pipePadreACaballo, sid);
+			freeEverything(semCaballos, mutex, pipePadreACaballo, sid, nCaballos);
 		}
 	}
 	/* Bucle que va despertando a los caballos y les
@@ -257,12 +259,12 @@ int main(int argc, char * argv[]){
 
 			if(write(pipePadreACaballo[i][ESCRIBIR], buffer, strlen(buffer)-1)==-1){
 				perror("Error al escribir en el pipe.");
-				freeEverything(semCaballos, mutex, pipePadreACaballo, sid);
+				freeEverything(semCaballos, mutex, pipePadreACaballo, sid, nCaballos);
 			}
 
 			if(Up_Semaforo(semCaballos, i, SEM_UNDO)==ERROR){
 				perror("Error al hacer up de semCaballos.\n");
-				freeEverything(semCaballos, mutex, pipePadreACaballo, sid);
+				freeEverything(semCaballos, mutex, pipePadreACaballo, sid, nCaballos);
 			}
 
 			/* Recibir el mensaje y actualizar posicionCaballo,
@@ -272,14 +274,14 @@ int main(int argc, char * argv[]){
 			/* Actualizamos el estado de la variable tiempo */
 			if(Down_Semaforo(mutex, 0, SEM_UNDO)==ERROR){
 				perror("Error al hacer down de mutex.\n");
-				freeEverything(semCaballos, mutex, pipePadreACaballo, sid);
+				freeEverything(semCaballos, mutex, pipePadreACaballo, sid, nCaballos);
 			}
 
 			/* Si ha ganado algun caballo lo actualizamos */
 
 			if(Up_Semaforo(mutex, 0, SEM_UNDO)==ERROR){
 				perror("Error al hacer up de mutex.\n");
-				freeEverything(semCaballos, mutex, pipePadreACaballo, sid);
+				freeEverything(semCaballos, mutex, pipePadreACaballo, sid, nCaballos);
 			}
 		}
 	}
@@ -290,7 +292,7 @@ int main(int argc, char * argv[]){
 	for(i=0;i<nCaballos;i++){
 		if(Up_Semaforo(semCaballos, i, SEM_UNDO)==ERROR){
 			perror("Error al hacer up de semCaballos.\n");
-			freeEverything(semCaballos, mutex, pipePadreACaballo, sid);
+			freeEverything(semCaballos, mutex, pipePadreACaballo, sid, nCaballos);
 		}
 	}
 	/*Borrar_Semaforo(mutex);
