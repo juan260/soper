@@ -39,7 +39,7 @@ int main(int argc, char * argv[]){
 
 	/* Declaracion de variables */
 	int nCaballos, longCarrera, nApostadores, nVentanillas, ret,
-		keySem, i, j;
+		keySem, i, j, tiempoId, posicionCaballoId, matrizApuestasId;
 	int ** pipePadreACaballo;
 	char buffer[MAXBUF];
 
@@ -62,13 +62,13 @@ int main(int argc, char * argv[]){
 	terminado y seguira bajando hasta llegar a -15, momento
 	en el cual el monitor sabrá que tiene que mostrar todas
 	las estadisticas */
-	int tiempo;
+	int * tiempo;
 
 	/* Array de ints con la posicion de todos los caballos */
 	int * posicionCaballo;
 
 	/* Array arrays de ints con la cantidad apostada a cada caballo
-		por cada apostador.*/
+		por cada apostador. */
 	int ** matrizApuestas;
 
 
@@ -104,7 +104,38 @@ int main(int argc, char * argv[]){
 		posicionCaballo[i]=0;
 	}
 	keySem = ftok("a.txt", PROJID);
-	Crear_Semaforo(keySem, 1, &semCaballos);
+	if(Crear_Semaforo(keySem, 1, &semCaballos)==ERROR){
+		freePipesCaballos(pipePadreACaballo);
+	}
+
+	/* Reservamos memoria para las variables de memoria compartida */
+	keySem = ftok("b.txt", PROJID);
+	if((tiempoId = shmget(key, sizeof(int),
+			IPC_CREAT | IPC_EXCL | SHM_R | SHM_W))==-1){
+			perror("Error al obtener la zona compartida de memoria.\n");
+			freePipesCaballos(pipePadreACaballo);
+			exit(EXIT_SUCCESS);
+	}
+
+	keySem = ftok("c.txt", PROJID);
+	if((posicionCaballoId = shmget(key, sizeof(int)*posicionCaballo,
+			IPC_CREAT | IPC_EXCL | SHM_R | SHM_W))==-1){
+			perror("Error al obtener la zona compartida de memoria.\n");
+			shmctl(tiempoId, IPC_RMID, (struct shmid_ds*)NULL);
+			freePipesCaballos(pipePadreACaballo);
+			exit(EXIT_SUCCESS);
+	}
+
+	keySem = ftok("d.txt", PROJID);
+	if((matrizApuestasId = shmget(key, sizeof(int)*posicionCaballo,
+			IPC_CREAT | IPC_EXCL | SHM_R | SHM_W))==-1){
+			perror("Error al obtener la zona compartida de memoria.\n");
+			shmctl(tiempoId, IPC_RMID, (struct shmid_ds*)NULL);
+			shmctl(posicionCaballoId, IPC_RMID, (struct shmid_ds*)NULL);
+			freePipesCaballos(pipePadreACaballo);
+			exit(EXIT_SUCCESS);
+	}
+
 
 	/* Crea proceso monitor */
 
@@ -119,7 +150,7 @@ int main(int argc, char * argv[]){
 	}
 
 	/* Ir bajando la variable tiempo de 15 a 0 */
-	
+
 	/* Bucle que va despertando a los caballos y les
 	va enviando y recibiendo las posiciones de los
 	caballos */
