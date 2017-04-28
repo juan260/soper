@@ -12,8 +12,9 @@ typedef struct caballomsg{
 }CaballoMsg;
 
 int caballo(int * pipe, int semId, int numCaballo,
-  int numCaballos);
+  int numCaballos, int msqid, int mutex, int *sid);
 
-int caballos(int numero, int ** pipes, int semId);
+int caballos(int numero, int ** pipes, int semId,
+  int msqid, int mutex, int *sid);
 
 #endif

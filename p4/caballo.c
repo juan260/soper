@@ -5,21 +5,29 @@
 #define MAXBUF 100
 
 int caballo(int * pipe, int semId, int numCaballo,
-				int numCaballos){
+				int numCaballos, int mutex, int *sid){
 	int ret, i, posicion, tirada;
 	int *posicionCaballo;
+	int * tiempo;
 	char buffer[MAXBUF];
 	CaballoMsg mensaje;
+
 
 	if((ret = fork())<0){
 		return CERROR;
 	} else if(ret == 0){
 		/* Codigo del caballo */
 		srand(time(NULL)^getpid()<<16);
+		tiempo = shmat(sid[0], NULL, 0);
 		posicionCaballo = (int*)malloc(sizeof(int)*numCaballos);
-		while(1/* No se ha acabado la carrera */){
+		while(1){
 			Down_Semaforo(semId, numCaballo, SEM_UNDO);
-
+			/* Comprobamos si ha terminadola carrera */
+			Down_Semaforo(mutex,0,SEM_UNDO);
+			if(tiempo<0){
+				break;
+			}
+			Up_Semaforo(mutex,0,SEM_UNDO);
 			read(pipe[LEER], (void *)buffer, MAXBUF-1);
 			for(i=0;i<numCaballos;i++){
 				sscanf(buffer, "%d ", posicionCaballo+i);
@@ -53,12 +61,6 @@ int caballo(int * pipe, int semId, int numCaballo,
 				posicionCaballo[numCaballo]=rand()%5+1;
 			}
 
-			/* Los proximos printf's se deberian de borrar */
-			for(i=0;i<numCaballos;i++){
-				printf("%d ", posicionCaballo[i]);
-			}
-			printf("\n");
-
 			mensaje.mtype=2;
 			for(i=0; i<numCaballos, i++){
 				mensaje.posiciones[i]=posicionCaballo[i];
@@ -66,15 +68,19 @@ int caballo(int * pipe, int semId, int numCaballo,
 			msgsnd(msqid, struct(msbuff*) &mensaje, sizeof(CaballoMsg)-sizeof(long), 0);
 		}
 		free(posicionCaballo);
+		shmdt(tiempo);
+		close(pipe[LEER]);
+		close(pipe[ESCRIBIR]);
+		exit(EXIT_SUCCESS);
 	} else {
 		return ret;
 	}
 }
 
-int caballos(int numero, int ** pipes, int semId, int msqid){
+int caballos(int numero, int ** pipes, int semId, int msqid, int mutex, int *sid){
 	int i;
 	for(i=0;i<numero;i++){
-		if(caballo(pipes[i], semId, i, numero, msqid)==CERROR){
+		if(caballo(pipes[i], semId, i, numero, msqid, mutex, sid)==CERROR){
 			return CERROR;
 		}
 	}

@@ -1,6 +1,6 @@
 
 CC = gcc -ansi -pedantic -D_GNU_SOURCE
-CFLAGS = -Wall -g 
+CFLAGS = -Wall -g
 
 all : caballos ejercicio1
 
@@ -9,6 +9,7 @@ clean :
 
 ejercicio1 : ejercicio1.o
 	$(CC) $(CFLAGS) -o $@ $@.o
+
 caballos : caballos.o semaforos.o caballo.o
 	$(CC) $(CFLAGS) -o $@ $@.o semaforos.o caballo.o
 
