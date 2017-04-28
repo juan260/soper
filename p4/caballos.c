@@ -89,7 +89,7 @@ int* incializarVariablesCompartidas(int nCaballos, int nApostadores){
 		}
 
 		/* Inicializamos las posiciones de los caballos */
-		if(posicionCaballo = shmat(sid[1], NULL, 0)==(void*)-1){
+		if((posicionCaballo = (int *)shmat(sid[1], NULL, 0))==(void*)-1){
 			shmctl(sid[0], IPC_RMID, (struct shmid_ds*)NULL);
 			shmctl(sid[1], IPC_RMID, (struct shmid_ds*)NULL);
 			shmctl(sid[2], IPC_RMID, (struct shmid_ds*)NULL);
@@ -99,7 +99,7 @@ int* incializarVariablesCompartidas(int nCaballos, int nApostadores){
 		for(i=0;i<nCaballos;i++){
 			posicionCaballo[i]=0;
 		}
-		if(shmdt(posicionCaballos)==(void*)-1){
+		if(shmdt(posicionCaballo)==(void*)-1){
 			shmctl(sid[0], IPC_RMID, (struct shmid_ds*)NULL);
 			shmctl(sid[1], IPC_RMID, (struct shmid_ds*)NULL);
 			shmctl(sid[2], IPC_RMID, (struct shmid_ds*)NULL);
@@ -107,7 +107,7 @@ int* incializarVariablesCompartidas(int nCaballos, int nApostadores){
 		}
 
 		/* Inicializamos la variable tiempo */
-		if(tiempo = shmat(sid[0], NULL, 0)==(void*)-1){
+		if(tiempo = (int *)shmat(sid[0], NULL, 0)==(void*)-1){
 			shmctl(sid[0], IPC_RMID, (struct shmid_ds*)NULL);
 			shmctl(sid[1], IPC_RMID, (struct shmid_ds*)NULL);
 			shmctl(sid[2], IPC_RMID, (struct shmid_ds*)NULL);
@@ -167,7 +167,7 @@ int main(int argc, char * argv[]){
 	/* Declaracion de la cola de mensajes y mensajes*/
 	int msqid;
 	CaballoMsg caballorcv;
-	
+
 	/* Declaracion de variables de memoria compartida */
 
 	/* Esta variable tendrá los segundos restantes hasta
@@ -206,7 +206,7 @@ int main(int argc, char * argv[]){
 		freePipesCaballos(pipePadreACaballo);
 		exit(EXIT_FAILURE);
 	}
-	
+
 	keyMsg = ftok("bin\ls", PROJID);
 	if((msqid=msgget(keyMsg, 0600|IPC_CREAT)==-1){
 		Borrar_Semaforo(semCaballos);
@@ -214,7 +214,7 @@ int main(int argc, char * argv[]){
 		freePipesCaballos(pipePadreACaballo);
 		exit(EXIT_FAILURE);
 	}
-	
+
 
 	/* Reservamos memoria para las variables de memoria compartida */
 	if((sid = inicializarVariablesCompartidas(nCaballos, nApostadores))==NULL){
@@ -225,6 +225,7 @@ int main(int argc, char * argv[]){
 	}
 
 	/* Crea proceso monitor */
+	monitor(int nCaballos, int nApostadores, int * sid, int mutex);
 
 	/* Crea proceso gestor de apuestas */
 
@@ -266,7 +267,7 @@ int main(int argc, char * argv[]){
 	while(carreraIniciada==1){
 
 		/* Despierto a los caballos y espero sus mensajes */
-		for(i=0;i<nCaballos&&carreraIniciada==1;i++){ 
+		for(i=0;i<nCaballos&&carreraIniciada==1;i++){
 			for(j=0;j<nCaballos;j++){
 				sprintf(buffer, "%d ", posicionCaballo[j]);
 			}
@@ -282,12 +283,12 @@ int main(int argc, char * argv[]){
 			}
 
 			msgrcv(msqid, (struct msgbuf*)&caballorcv, sizeof(CaballoMsg)-sizeof(long), 2, 0);
-			
+
 			Down_Semaforo(mutex, 1, SEM_UNDO);
-			for (j=0;j<nCaballos;j++){	
+			for (j=0;j<nCaballos;j++){
 				posicioncaballo[j]=caballorcv.posiciones[i];
 			}
-			
+
 			Up_Semaforo(mutex, 1, SEM_UNDO);
 
 			/* Actualizamos el estado de la variable tiempo */
