@@ -92,10 +92,10 @@ int main(int argc, char* argv[]) {
     		}
     		contadores[0]=1;
     		fclose(f1);
-				if(shmdt(contadores)<0){
-					perror("Error al hacer detach.\n");
-					exit(EXIT_FAILURE);
-				}
+			if(shmdt(contadores)<0){
+				perror("Error al hacer detach.\n");
+				exit(EXIT_FAILURE);
+			}
     		exit(EXIT_SUCCESS);
     	}
     	else{
@@ -117,10 +117,10 @@ int main(int argc, char* argv[]) {
     			contadores[2]++;
     		}
     		wait(NULL);
-				if(shmdt(contadores)<0){
-					perror("Error al hacer detach.\n");
-					exit(EXIT_FAILURE);
-				}
+			if(shmdt(contadores)<0){
+				perror("Error al hacer detach.\n");
+				exit(EXIT_FAILURE);
+			}
     		exit(EXIT_SUCCESS);
     	}
     }
