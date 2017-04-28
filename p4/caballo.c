@@ -9,6 +9,7 @@ int caballo(int * pipe, int semId, int numCaballo,
 	int ret, i, posicion, tirada;
 	int *posicionCaballo;
 	char buffer[MAXBUF];
+	CaballoMsg mensaje;
 
 	if((ret = fork())<0){
 		return CERROR;
@@ -58,9 +59,11 @@ int caballo(int * pipe, int semId, int numCaballo,
 			}
 			printf("\n");
 
-
-			/* Envía un mensaje a su padre que contenga
-			posicionCaballo */
+			mensaje.mtype=2;
+			for(i=0; i<numCaballos, i++){
+				mensaje.posiciones[i]=posicionCaballo[i];
+			}
+			msgsnd(msqid, struct(msbuff*) &mensaje, sizeof(CaballoMsg)-sizeof(long), 0);
 		}
 		free(posicionCaballo);
 	} else {
@@ -68,10 +71,10 @@ int caballo(int * pipe, int semId, int numCaballo,
 	}
 }
 
-int caballos(int numero, int ** pipes, int semId){
+int caballos(int numero, int ** pipes, int semId, int msqid){
 	int i;
 	for(i=0;i<numero;i++){
-		if(caballo(pipes[i], semId, i, numero)==CERROR){
+		if(caballo(pipes[i], semId, i, numero, msqid)==CERROR){
 			return CERROR;
 		}
 	}

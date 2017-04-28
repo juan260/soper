@@ -6,6 +6,11 @@
 #define LEER 0
 #define ESCRIBIR 1
 
+typedef struct caballomsg{
+	long mtype;
+	int posiciones[10];
+}CaballoMsg;
+
 int caballo(int * pipe, int semId, int numCaballo,
   int numCaballos);
 
