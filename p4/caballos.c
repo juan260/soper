@@ -145,7 +145,7 @@ int main(int argc, char * argv[]){
 
 	/* Declaracion de variables */
 	int nCaballos, longCarrera, nApostadores, nVentanillas, ret,
-		keySem, i, j, tiempoId, posicionCaballoId, matrizApuestasId,
+		keySem, keyMsg, i, j, tiempoId, posicionCaballoId, matrizApuestasId,
 		carreraIniciada=0;
 	int * sid=NULL;
 	int ** pipePadreACaballo=NULL;
@@ -162,7 +162,10 @@ int main(int argc, char * argv[]){
 	*/
 	int semCaballos, mutex;
 
-
+	/* Declaracion de la cola de mensajes y mensajes*/
+	int msqid;
+	CaballoMsg caballorcv;
+	
 	/* Declaracion de variables de memoria compartida */
 
 	/* Esta variable tendrá los segundos restantes hasta
@@ -177,7 +180,7 @@ int main(int argc, char * argv[]){
 	int * posicionCaballo;
 
 	/* Array arrays de ints con la cantidad apostada a cada caballo
-		por cada apostador. */
+		por cada apostador. (apostadorxcaballo) */
 	int ** matrizApuestas;
 
 
@@ -192,13 +195,24 @@ int main(int argc, char * argv[]){
 	keySem = ftok("semaforoCaballos.txt", PROJID);
 	if(Crear_Semaforo(keySem, 1, &semCaballos)==ERROR){
 		freePipesCaballos(pipePadreACaballo);
+		exit(EXIT_FAILURE);
 	}
 
 	keySem = ftok("semaforoMutex.txt", PROJID);
 	if(Crear_Semaforo(keySem, 1, &mutex)==ERROR){
 		Borrar_Semaforo(semCaballos);
 		freePipesCaballos(pipePadreACaballo);
+		exit(EXIT_FAILURE);
 	}
+	
+	keyMsg = ftok("bin\ls", PROJID);
+	if((msqid=msgget(keyMsg, 0600|IPC_CREAT)==-1){
+		Borrar_Semaforo(semCaballos);
+		Borrar_Semaforo(Mutex);
+		freePipesCaballos(pipePadreACaballo);
+		exit(EXIT_FAILURE);
+	}
+	
 
 	/* Reservamos memoria para las variables de memoria compartida */
 	if((sid = inicializarVariablesCompartidas(nCaballos, nApostadores))==NULL){
@@ -250,7 +264,7 @@ int main(int argc, char * argv[]){
 	while(carreraIniciada==1){
 
 		/* Despierto a los caballos y espero sus mensajes */
-		for(i=0;i<nCaballos&&carreraIniciada==1;i++){
+		for(i=0;i<nCaballos&&carreraIniciada==1;i++){ 
 			for(j=0;j<nCaballos;j++){
 				sprintf(buffer, "%d ", posicionCaballo[j]);
 			}
@@ -265,9 +279,14 @@ int main(int argc, char * argv[]){
 				freeEverything(semCaballos, mutex, pipePadreACaballo, sid);
 			}
 
-			/* Recibir el mensaje y actualizar posicionCaballo,
-			si no hay ningun mensaje, esperar. Comprobamos tambien si hay
-			algun caballo ganador. */
+			msgrcv(msqid, (struct msgbuf*)&caballorcv, sizeof(CaballoMsg)-sizeof(long), 2, 0);
+			
+			Down_Semaforo(mutex, 1, SEM_UNDO);
+			for (j=0;j<nCaballos;j++){	
+				posicioncaballo[j]=caballorcv.posiciones[i];
+			}
+			
+			Up_Semaforo(mutex, 1, SEM_UNDO);
 
 			/* Actualizamos el estado de la variable tiempo */
 			if(Down_Semaforo(mutex, 0, SEM_UNDO)==ERROR){
