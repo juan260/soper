@@ -3,7 +3,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include "semaforos.h"
 
-void monitor(int nCaballos, int nApostadores, int * sid, int mutex);
+int monitor(int nCaballos, int nApostadores, int * sid, int mutex);
 
 #endif

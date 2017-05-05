@@ -1,9 +1,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include <string.h>
 #include "semaforos.h"
 #include "caballo.h"
 #include "monitor.h"
+#include <errno.h>
 #define MAXBUF 100
 #define PROJID 1245
 
@@ -62,30 +64,37 @@ void freePipesCaballos(int ** pipes, int nCaballos){
 	free(pipes);
 }
 
-int* incializarVariablesCompartidas(int nCaballos, int nApostadores){
-		int key, sid[3], i;
+int incializarVariablesCompartidas(int nCaballos, int nApostadores, int sid[3]){
+		int key, i, size;
+		int key2;
 		int * posicionCaballo;
 		int * tiempo;
 		key = ftok("b.txt", PROJID);
-		if((sid[0] = shmget(key, sizeof(int),
-				IPC_CREAT | IPC_EXCL | SHM_R | SHM_W))==-1){
+		if((sid[0] = shmget(key, 4,
+				IPC_CREAT | SHM_R | SHM_W))==-1){
 
-				return NULL;
+				return -1;
 		}
 
-		key = ftok("c.txt", PROJID);
-		if((sid[1] = shmget(key, sizeof(int)*nCaballos,
-				IPC_CREAT | IPC_EXCL | SHM_R | SHM_W))==-1){
+		key2 = ftok("b.txt", PROJID+getpid()<<16);
+		size = sizeof(int)*nCaballos;
+		printf("\n\nSIZE : %d\n\n", size);
+		if((sid[1] = shmget(key2, 12,
+				IPC_CREAT | SHM_R | SHM_W))==-1){
+				printf("\n\n\nERRNO: %s\n\n\n",strerror(errno));
 				shmctl(sid[0], IPC_RMID, (struct shmid_ds*)NULL);
-				return NULL;
+				return -1;
 		}
 
-		key = ftok("d.txt", PROJID);
-		if((sid[2] = shmget(key, sizeof(int*)*nCaballos,
-				IPC_CREAT | IPC_EXCL | SHM_R | SHM_W))==-1){
+		size=sizeof(int*)*nCaballos;
+
+		printf("\n\nSIZE : %ld\n\n", sizeof(int*));
+		key = ftok("d.txt", PROJID+getpid()<<19);
+		if((sid[2] = shmget(key, size,
+				IPC_CREAT | SHM_R | SHM_W))==-1){
 				shmctl(sid[0], IPC_RMID, (struct shmid_ds*)NULL);
 				shmctl(sid[1], IPC_RMID, (struct shmid_ds*)NULL);
-				return NULL;
+				return -1;
 		}
 
 		/* Inicializamos las posiciones de los caballos */
@@ -93,38 +102,38 @@ int* incializarVariablesCompartidas(int nCaballos, int nApostadores){
 			shmctl(sid[0], IPC_RMID, (struct shmid_ds*)NULL);
 			shmctl(sid[1], IPC_RMID, (struct shmid_ds*)NULL);
 			shmctl(sid[2], IPC_RMID, (struct shmid_ds*)NULL);
-			return NULL;
+			return -1;
 		}
 		/* No controlamos la concurrencia porque no hemos hecho ningun fork aun*/
 		for(i=0;i<nCaballos;i++){
 			posicionCaballo[i]=0;
 		}
-		if(shmdt(posicionCaballo)==(void*)-1){
+		if(shmdt(posicionCaballo)==-1){
 			shmctl(sid[0], IPC_RMID, (struct shmid_ds*)NULL);
 			shmctl(sid[1], IPC_RMID, (struct shmid_ds*)NULL);
 			shmctl(sid[2], IPC_RMID, (struct shmid_ds*)NULL);
-			return NULL;
+			return -1;
 		}
 
 		/* Inicializamos la variable tiempo */
-		if(tiempo = (int *)shmat(sid[0], NULL, 0)==(void*)-1){
+		if((tiempo = (int *)shmat(sid[0], NULL, 0))==(void*)-1){
 			shmctl(sid[0], IPC_RMID, (struct shmid_ds*)NULL);
 			shmctl(sid[1], IPC_RMID, (struct shmid_ds*)NULL);
 			shmctl(sid[2], IPC_RMID, (struct shmid_ds*)NULL);
-			return NULL;
+			return -1;
 		}
 		/* No controlamos la concurrencia porque no hemos hecho ningun fork aun*/
 		*tiempo = 15;
-		if(pshmdt(tiempo)==(void*)-1){
+		if(shmdt(tiempo)==-1){
 			shmctl(sid[0], IPC_RMID, (struct shmid_ds*)NULL);
 			shmctl(sid[1], IPC_RMID, (struct shmid_ds*)NULL);
 			shmctl(sid[2], IPC_RMID, (struct shmid_ds*)NULL);
-			return NULL;
+			return -1;
 		}
 
 		/* Inicializamos la matriz de apuestas */
 
-		return sid;
+		return 0;
 }
 
 void freeVariablesCompartidas(int * sid){
@@ -149,7 +158,7 @@ int main(int argc, char * argv[]){
 	int nCaballos, longCarrera, nApostadores, nVentanillas, ret,
 		keySem, keyMsg, i, j, tiempoId, posicionCaballoId, matrizApuestasId,
 		carreraIniciada=0;
-	int * sid=NULL;
+	int sid[3];
 	int ** pipePadreACaballo=NULL;
 	char buffer[MAXBUF];
 
@@ -196,36 +205,37 @@ int main(int argc, char * argv[]){
 
 	keySem = ftok("semaforoCaballos.txt", PROJID);
 	if(Crear_Semaforo(keySem, 1, &semCaballos)==ERROR){
-		freePipesCaballos(pipePadreACaballo);
+		freePipesCaballos(pipePadreACaballo, nCaballos);
 		exit(EXIT_FAILURE);
 	}
 
 	keySem = ftok("semaforoMutex.txt", PROJID);
 	if(Crear_Semaforo(keySem, 1, &mutex)==ERROR){
 		Borrar_Semaforo(semCaballos);
-		freePipesCaballos(pipePadreACaballo);
+		freePipesCaballos(pipePadreACaballo, nCaballos);
 		exit(EXIT_FAILURE);
 	}
 
-	keyMsg = ftok("bin\ls", PROJID);
-	if((msqid=msgget(keyMsg, 0600|IPC_CREAT)==-1){
+	keyMsg = ftok("bin/ls", PROJID);
+	if((msqid=msgget(keyMsg, 0600|IPC_CREAT))==-1){
 		Borrar_Semaforo(semCaballos);
-		Borrar_Semaforo(Mutex);
-		freePipesCaballos(pipePadreACaballo);
+		Borrar_Semaforo(mutex);
+		freePipesCaballos(pipePadreACaballo, nCaballos);
 		exit(EXIT_FAILURE);
 	}
 
 
 	/* Reservamos memoria para las variables de memoria compartida */
-	if((sid = inicializarVariablesCompartidas(nCaballos, nApostadores))==NULL){
+	if(incializarVariablesCompartidas(nCaballos, nApostadores, sid)==-1){
 		perror("Error al incializar las variables de memoria compartida.\n");
 		Borrar_Semaforo(semCaballos);
 		Borrar_Semaforo(mutex);
-		freePipesCaballos(pipePadreACaballo);
+		freePipesCaballos(pipePadreACaballo, nCaballos);
+		exit(EXIT_FAILURE);
 	}
 
 	/* Crea proceso monitor */
-	monitor(int nCaballos, int nApostadores, int * sid, int mutex);
+	monitor(nCaballos, nApostadores, sid, mutex);
 
 	/* Crea proceso gestor de apuestas */
 
@@ -286,7 +296,7 @@ int main(int argc, char * argv[]){
 
 			Down_Semaforo(mutex, 1, SEM_UNDO);
 			for (j=0;j<nCaballos;j++){
-				posicioncaballo[j]=caballorcv.posiciones[i];
+				posicionCaballo[j]=caballorcv.posiciones[i];
 			}
 
 			Up_Semaforo(mutex, 1, SEM_UNDO);

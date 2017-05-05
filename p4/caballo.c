@@ -5,7 +5,7 @@
 #define MAXBUF 100
 
 int caballo(int * pipe, int semId, int numCaballo,
-				int numCaballos, int mutex, int *sid){
+				int numCaballos, int msqid, int mutex, int *sid){
 	int ret, i, posicion, tirada;
 	int *posicionCaballo;
 	int * tiempo;
@@ -24,7 +24,7 @@ int caballo(int * pipe, int semId, int numCaballo,
 			Down_Semaforo(semId, numCaballo, SEM_UNDO);
 			/* Comprobamos si ha terminadola carrera */
 			Down_Semaforo(mutex,0,SEM_UNDO);
-			if(tiempo<0){
+			if(*tiempo<0){
 				break;
 			}
 			Up_Semaforo(mutex,0,SEM_UNDO);
@@ -62,10 +62,10 @@ int caballo(int * pipe, int semId, int numCaballo,
 			}
 
 			mensaje.mtype=2;
-			for(i=0; i<numCaballos, i++){
+			for(i=0; i<numCaballos; i++){
 				mensaje.posiciones[i]=posicionCaballo[i];
 			}
-			msgsnd(msqid, struct(msbuff*) &mensaje, sizeof(CaballoMsg)-sizeof(long), 0);
+			msgsnd(msqid, (struct msbuff*) &mensaje, sizeof(CaballoMsg)-sizeof(long), 0);
 		}
 		free(posicionCaballo);
 		shmdt(tiempo);

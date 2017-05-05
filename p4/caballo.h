@@ -11,6 +11,7 @@ typedef struct caballomsg{
 	int posiciones[10];
 }CaballoMsg;
 
+
 int caballo(int * pipe, int semId, int numCaballo,
   int numCaballos, int msqid, int mutex, int *sid);
 

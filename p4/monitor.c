@@ -10,21 +10,21 @@ int monitor(int nCaballos, int nApostadores, int * sid, int mutex){
   int * tiempo;
   int * posicionCaballo;
   int ** matrizApuestas;
-  int tiempoAux, i, sumaTotal, sumaParcial, ret;
+  int tiempoAux, i, j, sumaTotal, sumaParcial, ret;
 
   if((ret=fork())<0){
     return -1;
   } else if(ret==0){
-    tiempo = (int*)shmat(sid[0], NULL, 0);
-    posicionCaballo = (int*)shmat(sid[1], NULL, 0);
-    matrizApuestas = (int**)shmat(sid[2], NULL, 0);
+    tiempo = (int *)shmat(sid[0], NULL, 0);
+    posicionCaballo = (int *)shmat(sid[1], NULL, 0);
+    matrizApuestas = (int **)shmat(sid[2], NULL, 0);
 
 
     while(1){
       tiempoAux = *tiempo;
       printf("Estado de la carrera:\n");
       if(tiempoAux>1){
-        printf("\tFaltan %d segundos para el comienzo de la carrera.\n");
+        printf("\tFaltan %d segundos para el comienzo de la carrera.\n", tiempoAux);
       } else if(tiempoAux==1){
         printf("\tFalta 1 segundo para el comienzo de la carrera.\n");
       } else if(tiempoAux<0){
@@ -54,7 +54,7 @@ int monitor(int nCaballos, int nApostadores, int * sid, int mutex){
         if(sumaParcial==0){
           printf("no hay apuestas a este caballo.\n");
         } else {
-          printf("%lf\n",(double)sumaTotal/(double)sumaParcial);
+          printf("%f\n",(double)sumaTotal/(double)sumaParcial);
         }
       }
       Up_Semaforo(mutex,2,SEM_UNDO);
