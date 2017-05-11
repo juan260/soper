@@ -18,9 +18,9 @@ int apostador(int numapostadores, int numcaballos, int msqid, int tiempop){
 			while (*tiempo>0){
 				ApuestaMsg apuesta;
 				apuesta.mtype = 1;
-				apuesta.numapostador = rand()%numapostadores;
+				apuesta.numapostador = i;
 				apuesta.numcaballo = rand()%numcaballos;
-				apuesta.apuesta = (double)rand()/RAND_MAX*1000;
+				apuesta.apuesta = ((double)rand()/RAND_MAX)*1000;
 				msgsnd(msqid, (struct msgbuf*) &apuesta, sizeof(ApuestaMsg)-sizeof(long), 0);
 				usleep(100000);
 			}
@@ -28,4 +28,5 @@ int apostador(int numapostadores, int numcaballos, int msqid, int tiempop){
 			exit(EXIT_SUCCESS);
 		}
 	}
+	return 1;
 }
