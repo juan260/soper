@@ -11,6 +11,22 @@
 
 void argumentosEntrada(int argc, char * argv[], int * nCaballos,
 	int * longCarrera, int * nApostadores, int * nVentanillas){
+	if(argc == 1){
+		perror("Error en la entrada de argumentos.\n"
+			"El comando de entrada deberia ser:"
+			"\n\n\t./caballos A B C D\n\nDonde:\n"
+			"-A: numero de caballos\n-B: longitud de"
+			" la carrera\n-C: numero de apostadores\n"
+			"-D: numero de ventanillas.\n"
+		"Asignando valores por defecto equivalentes al comando:\n\n"
+		"\t./caballos 5 100 5 5\n\n");
+		*nCaballos = 5;
+		*longCarrera = 100;
+		*nApostadores = 5;
+		*nVentanillas = 5;
+		return;
+	}
+
 	if(argc != 5){
 		perror("Error en la entrada de argumentos.\n"
 			"El comando de entrada deberia ser:"
@@ -65,38 +81,41 @@ void freePipesCaballos(int ** pipes, int nCaballos){
 }
 
 int incializarVariablesCompartidas(int nCaballos, int nApostadores, int sid[3]){
-		int key, i, size;
-		int key2;
+		int key, i, size, j;
 		int * posicionCaballo;
 		int * tiempo;
-		key = ftok("b.txt", PROJID);
-		if((sid[0] = shmget(key, 4,
-				IPC_CREAT | SHM_R | SHM_W))==-1){
+		int ** matrizApuestas;
 
+		key = ftok("keys", PROJID);
+		if((sid[0] = shmget(key, sizeof(int),
+				IPC_CREAT | SHM_R | SHM_W))==-1){
 				return -1;
 		}
 
-		key2 = ftok("b.txt", PROJID+getpid()<<16);
-		size = sizeof(int)*nCaballos;
-		printf("\n\nSIZE : %d\n\n", size);
-		if((sid[1] = shmget(key2, 12,
-				IPC_CREAT | SHM_R | SHM_W))==-1){
-				printf("\n\n\nERRNO: %s\n\n\n",strerror(errno));
+		key = ftok("keys/key1", PROJID+1);
+		if((sid[1] = shmget(key, sizeof(int)*nCaballos,
+				IPC_CREAT| IPC_EXCL| SHM_R | SHM_W))==-1){
+				if(errno==17 /*file exists*/){
+					shmctl(shmget(key, sizeof(int)*nCaballos,
+							IPC_CREAT| SHM_R | SHM_W), IPC_RMID,
+							(struct shmid_ds*)NULL);
+				}
 				shmctl(sid[0], IPC_RMID, (struct shmid_ds*)NULL);
 				return -1;
 		}
 
-		size=sizeof(int*)*nCaballos;
-
-		printf("\n\nSIZE : %ld\n\n", sizeof(int*));
-		key = ftok("d.txt", PROJID+getpid()<<19);
-		if((sid[2] = shmget(key, size,
-				IPC_CREAT | SHM_R | SHM_W))==-1){
+		key = ftok("keys/key2", PROJID+2);
+		if((sid[2] = shmget(key, sizeof(int*)*nCaballos,
+				IPC_CREAT |IPC_EXCL| SHM_R | SHM_W))==-1){
+				if(errno==17 /*file exists*/){
+					shmctl(shmget(key, sizeof(int*)*nCaballos,
+							IPC_CREAT| SHM_R | SHM_W), IPC_RMID,
+							(struct shmid_ds*)NULL);
+				}
 				shmctl(sid[0], IPC_RMID, (struct shmid_ds*)NULL);
 				shmctl(sid[1], IPC_RMID, (struct shmid_ds*)NULL);
 				return -1;
 		}
-
 		/* Inicializamos las posiciones de los caballos */
 		if((posicionCaballo = (int *)shmat(sid[1], NULL, 0))==(void*)-1){
 			shmctl(sid[0], IPC_RMID, (struct shmid_ds*)NULL);
@@ -132,7 +151,25 @@ int incializarVariablesCompartidas(int nCaballos, int nApostadores, int sid[3]){
 		}
 
 		/* Inicializamos la matriz de apuestas */
-
+		if((matrizApuestas = (int **)shmat(sid[1], NULL, 0))==(void*)-1){
+			shmctl(sid[0], IPC_RMID, (struct shmid_ds*)NULL);
+			shmctl(sid[1], IPC_RMID, (struct shmid_ds*)NULL);
+			shmctl(sid[2], IPC_RMID, (struct shmid_ds*)NULL);
+			return -1;
+		}
+		/* No controlamos la concurrencia porque no hemos hecho ningun fork aun*/
+		for(i=0;i<nCaballos;i++){
+			matrizApuestas[i] = (int*)malloc(sizeof(int)*nApostadores);
+			for(j=0;j<nApostadores;j++){
+				matrizApuestas[i][j]=0;
+			}
+		}
+		if(shmdt(matrizApuestas)==-1){
+			shmctl(sid[0], IPC_RMID, (struct shmid_ds*)NULL);
+			shmctl(sid[1], IPC_RMID, (struct shmid_ds*)NULL);
+			shmctl(sid[2], IPC_RMID, (struct shmid_ds*)NULL);
+			return -1;
+		}
 		return 0;
 }
 
@@ -199,17 +236,18 @@ int main(int argc, char * argv[]){
 	argumentosEntrada(argc, argv, &nCaballos, &longCarrera, &nApostadores,
 				&nVentanillas);
 
+	srand(time(NULL)*getpid()<<6);
 	/* Creacion de los medios de comunicacion entre el
 	proceso padre y los caballos, asi como los semaforos */
 	pipePadreACaballo = pipesCaballos(nCaballos);
 
-	keySem = ftok("semaforoCaballos.txt", PROJID);
+	keySem = ftok("keys", PROJID+3);
 	if(Crear_Semaforo(keySem, 1, &semCaballos)==ERROR){
 		freePipesCaballos(pipePadreACaballo, nCaballos);
 		exit(EXIT_FAILURE);
 	}
 
-	keySem = ftok("semaforoMutex.txt", PROJID);
+	keySem = ftok("keys", PROJID+4);
 	if(Crear_Semaforo(keySem, 1, &mutex)==ERROR){
 		Borrar_Semaforo(semCaballos);
 		freePipesCaballos(pipePadreACaballo, nCaballos);
