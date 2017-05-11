@@ -10,8 +10,9 @@ int monitor(int nCaballos, int nApostadores, int * sid, int mutex,
 
   int * tiempo;
   int * posicionCaballo;
-  int * matrizApuestas[10];
-  int tiempoAux, i, j, sumaTotal, sumaParcial, ret;
+  double * matrizApuestas[10];
+  int tiempoAux, i, j, ret;
+  double sumaTotal, sumaParcial;
 
   if((ret=fork())<0){
     return -1;
@@ -19,7 +20,7 @@ int monitor(int nCaballos, int nApostadores, int * sid, int mutex,
     tiempo = (int *)shmat(sid[0], NULL, 0);
     posicionCaballo = (int *)shmat(sid[1], NULL, 0);
     for(i=0;i<nApostadores;i++){
-      matrizApuestas[i] = (int *)shmat(matrizApuestasId[i], NULL, 0);
+      matrizApuestas[i] = (double *)shmat(matrizApuestasId[i], NULL, 0);
     }
 
     while(1){
@@ -41,7 +42,7 @@ int monitor(int nCaballos, int nApostadores, int * sid, int mutex,
       for(i=0;i<nApostadores;i++){
         printf("\t\t- El Apostador-%d ha apostado: ", i);
         for(j=0;j<nCaballos;j++){
-          printf("%d ",matrizApuestas[i][j]);
+          printf("%f ",matrizApuestas[i][j]);
           sumaTotal+=matrizApuestas[i][j];
         }
         printf("\n");

@@ -85,7 +85,7 @@ int incializarVariablesCompartidas(int nCaballos, int nApostadores, int sid[3],
 		int key, i, size, j;
 		int * posicionCaballo;
 		int * tiempo;
-		int * arrayApuestas;
+		double * arrayApuestas;
 
 		key = ftok("keys", PROJID);
 		if((sid[0] = shmget(key, sizeof(int),
@@ -144,7 +144,7 @@ int incializarVariablesCompartidas(int nCaballos, int nApostadores, int sid[3],
 			if((((*matrizApuestasId)[i]) = shmget(key, sizeof(double)*nApostadores,
 					IPC_CREAT| IPC_EXCL| SHM_R | SHM_W))==-1){
 					if(errno==17 /*file exists*/){
-						shmctl(shmget(key, sizeof(int)*nApostadores,
+						shmctl(shmget(key, sizeof(double)*nApostadores,
 								IPC_CREAT| SHM_R | SHM_W), IPC_RMID,
 								(struct shmid_ds*)NULL);
 					}
@@ -157,7 +157,7 @@ int incializarVariablesCompartidas(int nCaballos, int nApostadores, int sid[3],
 					return -1;
 			}
 
-			if((arrayApuestas = (int *)shmat((*matrizApuestasId)[i], NULL, 0))==(void*)-1){
+			if((arrayApuestas = (double *)shmat((*matrizApuestasId)[i], NULL, 0))==(void*)-1){
 				for(;i>=0;i--){
 					shmctl((*matrizApuestasId)[i], IPC_RMID, (struct shmid_ds*)NULL);
 				}
@@ -167,7 +167,7 @@ int incializarVariablesCompartidas(int nCaballos, int nApostadores, int sid[3],
 			}
 		/* No controlamos la concurrencia porque no hemos hecho ningun fork aun*/
 			for(j=0;j<nApostadores;j++){
-				arrayApuestas[j]=0;
+				arrayApuestas[j]=0.0;
 			}
 			if(shmdt(arrayApuestas)==-1){
 				for(;i>=0;i--){
