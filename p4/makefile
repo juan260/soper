@@ -11,13 +11,13 @@ ejercicio1 : ejercicio1.o
 	$(CC) $(CFLAGS) -o $@ $@.o
 
 caballos : caballos.o semaforos.o caballo.o monitor.o gestor.o apostador.o
-	$(CC) $(CFLAGS) -o $@ $@.o semaforos.o caballo.o monitor.o gestor.o apostador.o
+	$(CC) $(CFLAGS) -o $@ $@.o semaforos.o caballo.o monitor.o gestor.o apostador.o -pthread
 
 semaforos.o : semaforos.c semaforos.h
 	$(CC) -g -c $<
 
 caballos.o : caballos.c semaforos.h
-	$(CC) -g -c $<
+	$(CC) -g -c $< -pthread
 
 caballo.o : caballo.c caballo.h semaforos.h
 	$(CC) -g -c $<
@@ -26,7 +26,7 @@ monitor.o : monitor.c monitor.h semaforos.h
 	$(CC) -g -c $<
 
 gestor.o : gestor.c gestor.h semaforos.h
-	$(CC) -g -c $<
+	$(CC) -g -c $< -pthread
 
 apostador.o : apostador.c apostador.h semaforos.h
 	$(CC) -g -c $<
