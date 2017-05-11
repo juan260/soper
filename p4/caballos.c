@@ -397,10 +397,21 @@ int main(int argc, char * argv[]){
 			freeEverything(semCaballos, mutex, pipePadreACaballo, sid, nCaballos);
 		}
 	}
-	/*Borrar_Semaforo(mutex);
-	Borrar_Semaforo(semCaballos);
-	freePipesCaballos(pipePadreACaballo);
-	freeVariablesCompartidas(sid);*/
+
+	while(*tiempo>-15){
+		sleep(1);
+		if(Down_Semaforo(mutex, 0, SEM_UNDO)==ERROR){
+			perror("Error al hacer down del mutex.\n");
+			freeEverything(semCaballos, mutex, pipePadreACaballo, sid, nCaballos);
+		}
+		*tiempo--;
+		if(Up_Semaforo(mutex, 0, SEM_UNDO)==ERROR){
+			perror("Error al hacer up del mutex.\n");
+			freeEverything(semCaballos, mutex, pipePadreACaballo, sid, nCaballos);
+			exit(EXIT_FAILURE);
+		}
+	}
+	freeEverything(semCaballos,mutex,pipePadreACaballo,sid,nCaballos);
 	while(wait(NULL)>0);
 
 	exit(EXIT_SUCCESS);

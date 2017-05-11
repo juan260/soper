@@ -65,6 +65,23 @@ int monitor(int nCaballos, int nApostadores, int * sid, int mutex,
       sleep(1);
     }
     printf("Carrera finalizada.\n");
+    while(1){
+      if(*tiempo<=-15){
+        break;
+      }
+      printf("Segundos restantes para mostrar resultados: %d", *tiempo);
+      sleep(1);
+    }
+
+    printf("Mostrando resultados de la carrera: \n");
+    Down_Semaforo(mutex, 1, SEM_UNDO);
+    
+
+
+
+    Up_Semaforo(mutex,1,SEM_UNDO);
+    printf("\t");
+
     shmdt(tiempo);
     shmdt(posicionCaballo);
     shmdt(matrizApuestas);
