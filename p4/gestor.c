@@ -9,26 +9,43 @@ int gestor (int nventanillas, int napostadores, int ncaballos, int *mid, int tie
 	else if(ret!=0){
 		pthread_t ventanillas[nventanillas];
 		GestorInfo *g = (GestorInfo*) malloc(sizeof(GestorInfo));
+		double *axc[10];
+
+		
+		if((tiempo = shmat(tiempop, NULL, 0))==(void*)-1){
+			perror("Error al obtener la zona compartida de memoria en el gestor de apuesta\n");
+			exit(EXIT_FAILURE);
+		}
+
 		if(g==NULL){
 			perror("Error al reservar memoria en el gestor de apuesta\n");
 			*tiempo=-1;
+			shmdt(tiempo);
 			exit(EXIT_FAILURE);
 		}
-		if((tiempo = shmat(tiempop, NULL, 0))==(void*)-1){
-			perror("Error al obtener la zona compartida de memoria en el gestor de apuesta\n");
-			*tiempo=-1;
-			exit(EXIT_FAILURE);
+
+		for(i=0; i<napostadores; i++){
+			if((axc[i] = shmat(mid[i], NULL, 0))==(void*)-1){
+				for (;i>=0;i--){
+					shmdt(axc[i]);
+				}
+				free(g);
+				shmdt(tiempo);
+			}
 		}
-		
+		g->tiempo=tiempo;
+		g->axc=axc;
+		g->msqid=msqid;
+		g->mutex=semid;
 		for(i=0; i<nventanillas; i++){
-			 pthread_create(, NULL, first_matrix, (void*) m);
+			 pthread_create(ventanillas[i], NULL, ventanilla, (void*) g);
 		}
 	}
 
 }
 
 typedef struct gestorinfo{
-	double **cxa;
+	double **axc;
 	int *tiempo;
 	int msqid;
 	int mutex;
@@ -38,13 +55,13 @@ NULL* ventanilla(NULL *info){
 	GestorInfo *g = (GestorInfo*) info;
 	while(g->(*tiempo)>0){
 		ApuestaMsg rcv;
-		msgrcv(msqid,  (struct msgbuf*)&rcv, sizeof(ApuestaMsg)-sizeof(long), 1, 0);
-		if(Down_Semaforo(mutex, 2, SEM_UNDO)==ERROR){
+		msgrcv(g->msqid,  (struct msgbuf*)&rcv, sizeof(ApuestaMsg)-sizeof(long), 1, 0);
+		if(Down_Semaforo(g->mutex, 2, SEM_UNDO)==ERROR){
 			perror("Error de semaforos en el gestor de apuestas")
 			return NULL;
 		}
-		g->cxa[rcv.numapostador][rcv.numcaballo]+=rcv.apuesta;
-		if(Up_Semaforo(mutex, 2, SEM_UNDO)==ERROR){
+		g->axc[rcv.numapostador][rcv.numcaballo]+=rcv.apuesta;
+		if(Up_Semaforo(g->mutex, 2, SEM_UNDO)==ERROR){
 			perror("Error de semaforos en el gestor de apuestas")
 			return NULL;
 		}

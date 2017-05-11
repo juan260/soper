@@ -5,6 +5,8 @@
 #include "semaforos.h"
 #include "caballo.h"
 #include "monitor.h"
+#include "gestor.h"
+#include "apostador.h"
 #include <errno.h>
 #define MAXBUF 100
 #define PROJID 1245
@@ -286,9 +288,17 @@ int main(int argc, char * argv[]){
 	/*monitor(nCaballos, nApostadores, sid, mutex, matrizApuestasId);*/
 
 	/* Crea proceso gestor de apuestas */
-
+	if(gestor (nVentanillas, nApostadores, nCaballos, matrizApuestasId, sid[0], msqid, mutex)==-1){
+		freeEverything(semCaballos, mutex, pipePadreACaballo, sid, nCaballos);
+		while(wait(NULL)>0);
+		exit(EXIT_FAILURE);
+	}
 	/* Crea los procesos apostadores */
-
+	if(apostador(nApostadores, nCaballos, msqid, sid[0])==-1){
+		freeEverything(semCaballos, mutex, pipePadreACaballo, sid, nCaballos);
+		while(wait(NULL)>0);
+		exit(EXIT_FAILURE);
+	}
 	/* Crea los caballos */
 	if(caballos(nCaballos, pipePadreACaballo, semCaballos, msqid,
 				mutex, sid)==CERROR){
