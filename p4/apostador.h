@@ -1,6 +1,5 @@
 #ifndef APOSTADOR_H
 #define APOSTADOR_H
-#include "semaforos.h"
 #include <sys/types.h>
 #include <sys/ipc.h>
 #include <sys/msg.h>
@@ -18,4 +17,7 @@ typedef struct apuestamsg{
 	double apuesta;
 }ApuestaMsg;
 
-void apostador(int numapostadores, int numcaballos, int msqid, int *tiempo);
+void apostador(int numapostadores, int numcaballos, int msqid, int tiempop);
+
+
+#endif
