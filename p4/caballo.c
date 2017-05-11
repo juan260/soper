@@ -18,16 +18,44 @@ int caballo(int * pipe, int semId, int numCaballo,
 	} else if(ret == 0){
 		/* Codigo del caballo */
 		srand(time(NULL)^getpid()<<16);
-		tiempo = shmat(sid[0], NULL, 0);
+		if((tiempo = shmat(sid[0], NULL, 0))==(void*)-1){
+			exit(EXIT_FAILURE);
+		}
 		while(1){
-			Down_Semaforo(semId, numCaballo, SEM_UNDO);
+			if(Down_Semaforo(semId, numCaballo, SEM_UNDO)==CERROR){
+				close(pipe[LEER]);
+				close(pipe[ESCRIBIR]);
+				shmdt(tiempo);
+				perror("Error al hacer down en el caballo.\n")
+				exit(EXIT_FAILURE);
+			}
+
 			/* Comprobamos si ha terminadola carrera */
-			Down_Semaforo(mutex,0,SEM_UNDO);
+			if(Down_Semaforo(mutex,0,SEM_UNDO)==CERROR){
+				close(pipe[LEER]);
+				close(pipe[ESCRIBIR]);
+				shmdt(tiempo);
+				perror("Error al hacer down del mutex en el caballo.\n")
+				exit(EXIT_FAILURE);
+			}
 			if(*tiempo<0){
 				break;
 			}
-			Up_Semaforo(mutex,0,SEM_UNDO);
-			read(pipe[LEER], buffer, MAXBUF-1);
+			if(Up_Semaforo(mutex,0,SEM_UNDO)==CERROR){
+				close(pipe[LEER]);
+				close(pipe[ESCRIBIR]);
+				shmdt(tiempo);
+				perror("Error al hacer up del mutex en el caballo.\n");
+				exit(EXIT_FAILURE);
+			}
+
+			if(read(pipe[LEER], buffer, MAXBUF-1)==-1){
+				close(pipe[LEER]);
+				close(pipe[ESCRIBIR]);
+				shmdt(tiempo);
+				perror("Error al hacer read.\n")
+				exit(EXIT_FAILURE);
+			}
 			for(i=0;i<numCaballos;i++){
 				sscanf(buffer, "%d ", &posicionCaballo[i]);
 			}
@@ -64,7 +92,13 @@ int caballo(int * pipe, int semId, int numCaballo,
 			for(i=0; i<numCaballos; i++){
 				mensaje.posiciones[i]=posicionCaballo[i];
 			}
-			msgsnd(msqid, (struct msbuff*) &mensaje, sizeof(CaballoMsg)-sizeof(long), 0);
+			if(msgsnd(msqid, (struct msbuff*) &mensaje, sizeof(CaballoMsg)-sizeof(long), 0)==-1){
+				close(pipe[LEER]);
+				close(pipe[ESCRIBIR]);
+				shmdt(tiempo);
+				perror("Error al enviar el mensaje desde el caballo.\n")
+				exit(EXIT_FAILURE);
+			}
 		}
 		shmdt(tiempo);
 		close(pipe[LEER]);
