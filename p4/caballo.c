@@ -7,7 +7,7 @@
 int caballo(int * pipe, int semId, int numCaballo,
 				int numCaballos, int msqid, int mutex, int *sid){
 	int ret, i, posicion, tirada;
-	int *posicionCaballo;
+	int posicionCaballo[10];
 	int * tiempo;
 	char buffer[MAXBUF];
 	CaballoMsg mensaje;
@@ -19,7 +19,6 @@ int caballo(int * pipe, int semId, int numCaballo,
 		/* Codigo del caballo */
 		srand(time(NULL)^getpid()<<16);
 		tiempo = shmat(sid[0], NULL, 0);
-		posicionCaballo = (int*)malloc(sizeof(int)*numCaballos);
 		while(1){
 			Down_Semaforo(semId, numCaballo, SEM_UNDO);
 			/* Comprobamos si ha terminadola carrera */
@@ -28,9 +27,9 @@ int caballo(int * pipe, int semId, int numCaballo,
 				break;
 			}
 			Up_Semaforo(mutex,0,SEM_UNDO);
-			read(pipe[LEER], (void *)buffer, MAXBUF-1);
+			read(pipe[LEER], buffer, MAXBUF-1);
 			for(i=0;i<numCaballos;i++){
-				sscanf(buffer, "%d ", posicionCaballo+i);
+				sscanf(buffer, "%d ", &posicionCaballo[i]);
 			}
 			/* Comprobamos la posicion del caballo
 			y despues si es el primero o ultimo.
@@ -67,7 +66,6 @@ int caballo(int * pipe, int semId, int numCaballo,
 			}
 			msgsnd(msqid, (struct msbuff*) &mensaje, sizeof(CaballoMsg)-sizeof(long), 0);
 		}
-		free(posicionCaballo);
 		shmdt(tiempo);
 		close(pipe[LEER]);
 		close(pipe[ESCRIBIR]);

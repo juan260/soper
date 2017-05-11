@@ -283,7 +283,7 @@ int main(int argc, char * argv[]){
 	}
 
 	/* Crea proceso monitor */
-	monitor(nCaballos, nApostadores, sid, mutex, matrizApuestasId);
+	/*monitor(nCaballos, nApostadores, sid, mutex, matrizApuestasId);*/
 
 	/* Crea proceso gestor de apuestas */
 
@@ -302,9 +302,15 @@ int main(int argc, char * argv[]){
 		freeEverything(semCaballos, mutex, pipePadreACaballo, sid, nCaballos);
 	}
 
+	if(Up_Semaforo(mutex, 0, SEM_UNDO)==ERROR){
+		perror("Error al hacer down del mutex.\n");
+		freeEverything(semCaballos, mutex, pipePadreACaballo, sid, nCaballos);
+	}
+
 	carreraIniciada = 0;
 	while(carreraIniciada==0){
 		sleep(1);
+		printf("\n\n\n\n HEMOS LLEGAO HASTA AQUIII\n\n\n");
 		if(Down_Semaforo(mutex, 0, SEM_UNDO)==ERROR){
 			perror("Error al hacer down del mutex.\n");
 			freeEverything(semCaballos, mutex, pipePadreACaballo, sid, nCaballos);
@@ -317,7 +323,14 @@ int main(int argc, char * argv[]){
 		if(Up_Semaforo(mutex, 0, SEM_UNDO)==ERROR){
 			perror("Error al hacer up del mutex.\n");
 			freeEverything(semCaballos, mutex, pipePadreACaballo, sid, nCaballos);
+			exit(EXIT_FAILURE);
 		}
+	}
+
+	if((posicionCaballo = (int *)shmat(sid[1], NULL, 0))==(void*)-1){
+		perror("Error al obtener posicionCaballo.\n");
+		freeEverything(semCaballos, mutex, pipePadreACaballo, sid, nCaballos);
+		exit(EXIT_FAILURE);
 	}
 	/* Bucle que va despertando a los caballos y les
 	va enviando y recibiendo las posiciones de los
