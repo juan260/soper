@@ -11,7 +11,7 @@ int monitor(int nCaballos, int nApostadores, int * sid, int mutex,
   int * tiempo;
   int * posicionCaballo;
   double * matrizApuestas[10];
-  int tiempoAux, i, j, ret;
+  int tiempoAux, i, j, ret, primero, segundo, tercero;
   double sumaTotal, sumaParcial;
 
   if((ret=fork())<0){
@@ -64,23 +64,41 @@ int monitor(int nCaballos, int nApostadores, int * sid, int mutex,
       printf("\n");
       sleep(1);
     }
-    printf("Carrera finalizada.\n");
+    printf("\n================Carrera finalizada==================\n");
+    printf("\nMostrando resultados de la carrera: \n");
+    Down_Semaforo(mutex, 1, SEM_UNDO);
+    primero = 0;
+    segundo = 0;
+    tercero = 0;
+   	for(i=1;i<nCaballos;i++){
+   		if(posicionCaballo[i]>posicionCaballo[primero]){
+   			tercero = segundo;
+   			segundo = primero;
+   		} else if(posicionCaballo[i]>posicionCaballo[segundo]) {
+   			tercero = segundo;
+   			segundo = i;
+   		} else if(posicionCaballo[i]>posicionCaballo[segundo]) {
+   			tercero = i;
+   		}
+   	}
+   	Up_Semaforo(mutex,1,SEM_UNDO);
+    printf("\t- Numero del caballo ganador: %d\n", primero);
+    if(nCaballos>1){
+    	printf("\t- Numero del segundo puesto: %d\n", segundo);
+    }
+    if(nCaballos>2){
+    	printf("\t- Numero del tercer puesto: %d\n". tercero);
+    }
+    printf("\n");
     while(1){
       if(*tiempo<=-15){
         break;
       }
-      printf("Segundos restantes para mostrar resultados: %d", *tiempo);
+      printf("Segundos restantes para mostrar resultados\n\t de las apuestas: %d\n", *tiempo);
       sleep(1);
     }
 
-    printf("Mostrando resultados de la carrera: \n");
-    Down_Semaforo(mutex, 1, SEM_UNDO);
-    
 
-
-
-    Up_Semaforo(mutex,1,SEM_UNDO);
-    printf("\t");
 
     shmdt(tiempo);
     shmdt(posicionCaballo);
