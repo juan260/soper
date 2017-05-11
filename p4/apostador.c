@@ -3,10 +3,11 @@
 int apostador(int numapostadores, int numcaballos, int msqid, int tiempop){	
 	srand(time(NULL)*getpid()>>16);
 	int ret, i;
-	if((tiempo = shmat(tiempop, NULL, 0))==(void*)-1){
+	int *tiempo;
+	if((tiempo = shmat(tiempop, NULL, 0))== (void*)-1){
 		perror("Error al obtener la zona compartida de memoria en el apostador\n");
 		*tiempo=-1;
-		return -1
+		return -1;
 	}
 	for (i=0; i<numapostadores; i++){
 		if(ret=fork()<0){

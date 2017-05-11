@@ -95,7 +95,9 @@ int incializarVariablesCompartidas(int nCaballos, int nApostadores, int sid[3],
 				return -1;
 		}
 
+
 		key = ftok("keys/key1", PROJID+1);
+		printf("%d\n", key);
 		if((sid[1] = shmget(key, sizeof(int)*nCaballos,
 				IPC_CREAT| IPC_EXCL| SHM_R | SHM_W))==-1){
 				if(errno==17 /*file exists*/){
@@ -107,8 +109,7 @@ int incializarVariablesCompartidas(int nCaballos, int nApostadores, int sid[3],
 				return -1;
 		}
 
-
-
+		printf("Juan no sabe programar\n");
 		/* Inicializamos las posiciones de los caballos */
 		if((posicionCaballo = (int *)shmat(sid[1], NULL, 0))==(void*)-1){
 			shmctl(sid[0], IPC_RMID, (struct shmid_ds*)NULL);

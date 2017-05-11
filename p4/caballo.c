@@ -26,7 +26,7 @@ int caballo(int * pipe, int semId, int numCaballo,
 				close(pipe[LEER]);
 				close(pipe[ESCRIBIR]);
 				shmdt(tiempo);
-				perror("Error al hacer down en el caballo.\n")
+				perror("Error al hacer down en el caballo.\n");
 				exit(EXIT_FAILURE);
 			}
 
@@ -35,7 +35,7 @@ int caballo(int * pipe, int semId, int numCaballo,
 				close(pipe[LEER]);
 				close(pipe[ESCRIBIR]);
 				shmdt(tiempo);
-				perror("Error al hacer down del mutex en el caballo.\n")
+				perror("Error al hacer down del mutex en el caballo.\n");
 				exit(EXIT_FAILURE);
 			}
 			if(*tiempo<0){
@@ -53,7 +53,7 @@ int caballo(int * pipe, int semId, int numCaballo,
 				close(pipe[LEER]);
 				close(pipe[ESCRIBIR]);
 				shmdt(tiempo);
-				perror("Error al hacer read.\n")
+				perror("Error al hacer read.\n");
 				exit(EXIT_FAILURE);
 			}
 			for(i=0;i<numCaballos;i++){
@@ -96,7 +96,7 @@ int caballo(int * pipe, int semId, int numCaballo,
 				close(pipe[LEER]);
 				close(pipe[ESCRIBIR]);
 				shmdt(tiempo);
-				perror("Error al enviar el mensaje desde el caballo.\n")
+				perror("Error al enviar el mensaje desde el caballo.\n");
 				exit(EXIT_FAILURE);
 			}
 		}

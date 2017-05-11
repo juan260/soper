@@ -17,7 +17,7 @@ typedef struct apuestamsg{
 	double apuesta;
 }ApuestaMsg;
 
-void apostador(int numapostadores, int numcaballos, int msqid, int tiempop);
+int apostador(int numapostadores, int numcaballos, int msqid, int tiempop);
 
 
 #endif
