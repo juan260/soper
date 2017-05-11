@@ -14,3 +14,6 @@
 #include <pthread.h>
 
 int gestor (int nventanillas, int napostadores, int ncaballos, int *mid, int tiempop, int msqid, int semid);
+
+
+#endif
