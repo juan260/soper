@@ -5,6 +5,7 @@
 #include <unistd.h>
 #include "semaforos.h"
 
-int monitor(int nCaballos, int nApostadores, int * sid, int mutex);
+int monitor(int nCaballos, int nApostadores, int * sid, int mutex,
+  int* matrizApuestasId);
 
 #endif

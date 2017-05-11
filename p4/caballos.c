@@ -80,11 +80,12 @@ void freePipesCaballos(int ** pipes, int nCaballos){
 	free(pipes);
 }
 
-int incializarVariablesCompartidas(int nCaballos, int nApostadores, int sid[3]){
+int incializarVariablesCompartidas(int nCaballos, int nApostadores, int sid[3],
+ int **matrizApuestasId){
 		int key, i, size, j;
 		int * posicionCaballo;
 		int * tiempo;
-		int ** matrizApuestas;
+		int * arrayApuestas;
 
 		key = ftok("keys", PROJID);
 		if((sid[0] = shmget(key, sizeof(int),
@@ -104,23 +105,12 @@ int incializarVariablesCompartidas(int nCaballos, int nApostadores, int sid[3]){
 				return -1;
 		}
 
-		key = ftok("keys/key2", PROJID+2);
-		if((sid[2] = shmget(key, sizeof(int*)*nCaballos,
-				IPC_CREAT |IPC_EXCL| SHM_R | SHM_W))==-1){
-				if(errno==17 /*file exists*/){
-					shmctl(shmget(key, sizeof(int*)*nCaballos,
-							IPC_CREAT| SHM_R | SHM_W), IPC_RMID,
-							(struct shmid_ds*)NULL);
-				}
-				shmctl(sid[0], IPC_RMID, (struct shmid_ds*)NULL);
-				shmctl(sid[1], IPC_RMID, (struct shmid_ds*)NULL);
-				return -1;
-		}
+
+
 		/* Inicializamos las posiciones de los caballos */
 		if((posicionCaballo = (int *)shmat(sid[1], NULL, 0))==(void*)-1){
 			shmctl(sid[0], IPC_RMID, (struct shmid_ds*)NULL);
 			shmctl(sid[1], IPC_RMID, (struct shmid_ds*)NULL);
-			shmctl(sid[2], IPC_RMID, (struct shmid_ds*)NULL);
 			return -1;
 		}
 		/* No controlamos la concurrencia porque no hemos hecho ningun fork aun*/
@@ -130,7 +120,6 @@ int incializarVariablesCompartidas(int nCaballos, int nApostadores, int sid[3]){
 		if(shmdt(posicionCaballo)==-1){
 			shmctl(sid[0], IPC_RMID, (struct shmid_ds*)NULL);
 			shmctl(sid[1], IPC_RMID, (struct shmid_ds*)NULL);
-			shmctl(sid[2], IPC_RMID, (struct shmid_ds*)NULL);
 			return -1;
 		}
 
@@ -138,7 +127,6 @@ int incializarVariablesCompartidas(int nCaballos, int nApostadores, int sid[3]){
 		if((tiempo = (int *)shmat(sid[0], NULL, 0))==(void*)-1){
 			shmctl(sid[0], IPC_RMID, (struct shmid_ds*)NULL);
 			shmctl(sid[1], IPC_RMID, (struct shmid_ds*)NULL);
-			shmctl(sid[2], IPC_RMID, (struct shmid_ds*)NULL);
 			return -1;
 		}
 		/* No controlamos la concurrencia porque no hemos hecho ningun fork aun*/
@@ -146,37 +134,57 @@ int incializarVariablesCompartidas(int nCaballos, int nApostadores, int sid[3]){
 		if(shmdt(tiempo)==-1){
 			shmctl(sid[0], IPC_RMID, (struct shmid_ds*)NULL);
 			shmctl(sid[1], IPC_RMID, (struct shmid_ds*)NULL);
-			shmctl(sid[2], IPC_RMID, (struct shmid_ds*)NULL);
 			return -1;
 		}
 
 		/* Inicializamos la matriz de apuestas */
-		if((matrizApuestas = (int **)shmat(sid[1], NULL, 0))==(void*)-1){
-			shmctl(sid[0], IPC_RMID, (struct shmid_ds*)NULL);
-			shmctl(sid[1], IPC_RMID, (struct shmid_ds*)NULL);
-			shmctl(sid[2], IPC_RMID, (struct shmid_ds*)NULL);
-			return -1;
-		}
-		/* No controlamos la concurrencia porque no hemos hecho ningun fork aun*/
+		*matrizApuestasId = (int *)malloc(sizeof(int)*nCaballos);
 		for(i=0;i<nCaballos;i++){
-			matrizApuestas[i] = (int*)malloc(sizeof(int)*nApostadores);
+			key = ftok("keys/key3", PROJID+i);
+			if((((*matrizApuestasId)[i]) = shmget(key, sizeof(double)*nApostadores,
+					IPC_CREAT| IPC_EXCL| SHM_R | SHM_W))==-1){
+					if(errno==17 /*file exists*/){
+						shmctl(shmget(key, sizeof(int)*nApostadores,
+								IPC_CREAT| SHM_R | SHM_W), IPC_RMID,
+								(struct shmid_ds*)NULL);
+					}
+					i--;
+					for(;i>=0;i--){
+						shmctl((*matrizApuestasId)[i], IPC_RMID, (struct shmid_ds*)NULL);
+					}
+					shmctl(sid[1], IPC_RMID, (struct shmid_ds*)NULL);
+					shmctl(sid[0], IPC_RMID, (struct shmid_ds*)NULL);
+					return -1;
+			}
+
+			if((arrayApuestas = (int *)shmat((*matrizApuestasId)[i], NULL, 0))==(void*)-1){
+				for(;i>=0;i--){
+					shmctl((*matrizApuestasId)[i], IPC_RMID, (struct shmid_ds*)NULL);
+				}
+				shmctl(sid[0], IPC_RMID, (struct shmid_ds*)NULL);
+				shmctl(sid[1], IPC_RMID, (struct shmid_ds*)NULL);
+				return -1;
+			}
+		/* No controlamos la concurrencia porque no hemos hecho ningun fork aun*/
 			for(j=0;j<nApostadores;j++){
-				matrizApuestas[i][j]=0;
+				arrayApuestas[j]=0;
+			}
+			if(shmdt(arrayApuestas)==-1){
+				for(;i>=0;i--){
+					shmctl((*matrizApuestasId)[i], IPC_RMID, (struct shmid_ds*)NULL);
+				}
+				shmctl(sid[0], IPC_RMID, (struct shmid_ds*)NULL);
+				shmctl(sid[1], IPC_RMID, (struct shmid_ds*)NULL);
+				return -1;
 			}
 		}
-		if(shmdt(matrizApuestas)==-1){
-			shmctl(sid[0], IPC_RMID, (struct shmid_ds*)NULL);
-			shmctl(sid[1], IPC_RMID, (struct shmid_ds*)NULL);
-			shmctl(sid[2], IPC_RMID, (struct shmid_ds*)NULL);
-			return -1;
-		}
+
 		return 0;
 }
 
 void freeVariablesCompartidas(int * sid){
 	if((shmctl(sid[0], IPC_RMID, (struct shmid_ds*)NULL)==-1) ||
-		 (shmctl(sid[1], IPC_RMID, (struct shmid_ds*)NULL)==-1) ||
-	 	 (shmctl(sid[2], IPC_RMID, (struct shmid_ds*)NULL)==-1)){
+		 (shmctl(sid[1], IPC_RMID, (struct shmid_ds*)NULL)==-1)){
 		perror("Error al eliminar la memoria compartida.");
 	}
 }
@@ -193,10 +201,11 @@ int main(int argc, char * argv[]){
 
 	/* Declaracion de variables */
 	int nCaballos, longCarrera, nApostadores, nVentanillas, ret,
-		keySem, keyMsg, i, j, tiempoId, posicionCaballoId, matrizApuestasId,
+		keySem, keyMsg, i, j, tiempoId, posicionCaballoId,
 		carreraIniciada=0;
 	int sid[3];
 	int ** pipePadreACaballo=NULL;
+	int * matrizApuestasId;
 	char buffer[MAXBUF];
 
 
@@ -229,7 +238,7 @@ int main(int argc, char * argv[]){
 
 	/* Array arrays de ints con la cantidad apostada a cada caballo
 		por cada apostador. (apostadorxcaballo) */
-	int ** matrizApuestas;
+	int * matrizApuestas[10];
 
 
 	/* Comprobacion de los argumentos de entrada */
@@ -264,7 +273,8 @@ int main(int argc, char * argv[]){
 
 
 	/* Reservamos memoria para las variables de memoria compartida */
-	if(incializarVariablesCompartidas(nCaballos, nApostadores, sid)==-1){
+	if(incializarVariablesCompartidas(nCaballos, nApostadores, sid,
+			&matrizApuestasId)==-1){
 		perror("Error al incializar las variables de memoria compartida.\n");
 		Borrar_Semaforo(semCaballos);
 		Borrar_Semaforo(mutex);
@@ -273,7 +283,7 @@ int main(int argc, char * argv[]){
 	}
 
 	/* Crea proceso monitor */
-	monitor(nCaballos, nApostadores, sid, mutex);
+	monitor(nCaballos, nApostadores, sid, mutex, matrizApuestasId);
 
 	/* Crea proceso gestor de apuestas */
 

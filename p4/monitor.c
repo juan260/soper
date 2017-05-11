@@ -5,11 +5,12 @@
 * El padre devuelve el pid del hijo, o -1 en caso de error.
 */
 
-int monitor(int nCaballos, int nApostadores, int * sid, int mutex){
+int monitor(int nCaballos, int nApostadores, int * sid, int mutex,
+    int* matrizApuestasId){
 
   int * tiempo;
   int * posicionCaballo;
-  int ** matrizApuestas;
+  int * matrizApuestas[10];
   int tiempoAux, i, j, sumaTotal, sumaParcial, ret;
 
   if((ret=fork())<0){
@@ -17,8 +18,9 @@ int monitor(int nCaballos, int nApostadores, int * sid, int mutex){
   } else if(ret==0){
     tiempo = (int *)shmat(sid[0], NULL, 0);
     posicionCaballo = (int *)shmat(sid[1], NULL, 0);
-    matrizApuestas = (int **)shmat(sid[2], NULL, 0);
-
+    for(i=0;i<nApostadores;i++){
+      matrizApuestas[i] = (int *)shmat(matrizApuestasId[i], NULL, 0);
+    }
 
     while(1){
       tiempoAux = *tiempo;
