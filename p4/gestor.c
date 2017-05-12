@@ -28,16 +28,16 @@ void* ventanilla(void *info){
 
 int gestor (int nventanillas, int napostadores, int ncaballos, int *mid, int tiempop, int msqid, int semid){
 	int ret, i;
-	if(ret=fork()<0){
+	if((ret=fork())<0){
 		perror("Error de fork");
 		return -1;
 	}
-	else if(ret!=0){
-		pthread_t ventanillas[nventanillas];
+	else if(ret==0){
+		pthread_t *ventanillas = (pthread_t*) malloc((sizeof(pthread_t)*nventanillas));
 		GestorInfo *g = (GestorInfo*) malloc(sizeof(GestorInfo));
 		double *axc[10];
 		int *tiempo;
-		
+
 		if((tiempo = shmat(tiempop, NULL, 0))==(void*)-1){
 			perror("Error al obtener la zona compartida de memoria en el gestor de apuesta\n");
 			exit(EXIT_FAILURE);
@@ -64,8 +64,16 @@ int gestor (int nventanillas, int napostadores, int ncaballos, int *mid, int tie
 		g->msqid=msqid;
 		g->mutex=semid;
 		for(i=0; i<nventanillas; i++){
-			 pthread_create(ventanillas[i], NULL, ventanilla, (void*) g);
+			 pthread_create(&ventanillas[i], NULL, ventanilla, (void*) g);
 		}
+		for(i=0; i<nventanillas; i++){
+			pthread_join(ventanillas[i], NULL);
+		}
+		return 2;
+	}
+	else{
+		printf("JODEEEEEEEEEEEEEEEEEER\n"	);
+		return 1;
 	}
 
 }

@@ -89,14 +89,14 @@ int incializarVariablesCompartidas(int nCaballos, int nApostadores, int sid[3],
 		int * tiempo;
 		double * arrayApuestas;
 
-		key = ftok("keys", PROJID);
+		key = ftok("/bin/ls", PROJID+7);
 		if((sid[0] = shmget(key, sizeof(int),
 				IPC_CREAT | SHM_R | SHM_W))==-1){
 				return -1;
 		}
 
 
-		key = ftok("keys/key1", PROJID+1);
+		key = ftok("/bin/ls", PROJID+8);
 		printf("%d\n", key);
 		if((sid[1] = shmget(key, sizeof(int)*nCaballos,
 				IPC_CREAT| IPC_EXCL| SHM_R | SHM_W))==-1){
@@ -143,7 +143,7 @@ int incializarVariablesCompartidas(int nCaballos, int nApostadores, int sid[3],
 		/* Inicializamos la matriz de apuestas */
 		*matrizApuestasId = (int *)malloc(sizeof(int)*nCaballos);
 		for(i=0;i<nCaballos;i++){
-			key = ftok("keys/key3", PROJID+i);
+			key = ftok("/bin/ls", PROJID+9+i);
 			if((((*matrizApuestasId)[i]) = shmget(key, sizeof(double)*nApostadores,
 					IPC_CREAT| IPC_EXCL| SHM_R | SHM_W))==-1){
 					if(errno==17 /*file exists*/){
@@ -243,6 +243,7 @@ int main(int argc, char * argv[]){
 		por cada apostador. (apostadorxcaballo) */
 	int * matrizApuestas[10];
 
+ printf("si esto sale dos veces estamos jodidos\n");
 
 	/* Comprobacion de los argumentos de entrada */
 	argumentosEntrada(argc, argv, &nCaballos, &longCarrera, &nApostadores,
@@ -253,8 +254,8 @@ int main(int argc, char * argv[]){
 	proceso padre y los caballos, asi como los semaforos */
 	pipePadreACaballo = pipesCaballos(nCaballos);
 
-	keySem = ftok("/bin/ls", PROJID);
-	printf("%d",keySem);
+	keySem = ftok("/bin/ls", PROJID+1);
+	printf("%d y %d\n",keySem,nCaballos);
 	if(Crear_Semaforo(keySem, nCaballos, &semCaballos)==ERROR){
 		freePipesCaballos(pipePadreACaballo, nCaballos);
 		perror("Error en semCaballos");
@@ -269,7 +270,7 @@ int main(int argc, char * argv[]){
 		exit(EXIT_FAILURE);
 	}
 
-	keyMsg = ftok("bin/ls", PROJID);
+	keyMsg = ftok("/bin/ls", PROJID+5);
 	if((msqid=msgget(keyMsg, 0600|IPC_CREAT))==-1){
 		Borrar_Semaforo(semCaballos);
 		Borrar_Semaforo(mutex);
@@ -278,7 +279,7 @@ int main(int argc, char * argv[]){
 		exit(EXIT_FAILURE);
 	}
 
-	printf("sadf2" );
+	printf("odio soper\n");
 
 	/* Reservamos memoria para las variables de memoria compartida */
 	if(incializarVariablesCompartidas(nCaballos, nApostadores, sid,
@@ -289,29 +290,33 @@ int main(int argc, char * argv[]){
 		freePipesCaballos(pipePadreACaballo, nCaballos);
 		exit(EXIT_FAILURE);
 	}
-
+		printf("is this the real life\n" );
 	/* Crea proceso monitor */
 	/*monitor(nCaballos, nApostadores, sid, mutex, matrizApuestasId);*/
-printf("sadf2" );
 	/* Crea proceso gestor de apuestas */
-	if(gestor (nVentanillas, nApostadores, nCaballos, matrizApuestasId, sid[0], msqid, mutex)==-1){
+	if((ret=gestor (nVentanillas, nApostadores, nCaballos, matrizApuestasId, sid[0], msqid, mutex))==-1){
 		freeEverything(semCaballos, mutex, pipePadreACaballo, sid, nCaballos);
 		while(wait(NULL)>0);
 		exit(EXIT_FAILURE);
 	}
+	else if(ret==2){
+		exit(EXIT_SUCCESS);
+	}
+	printf("or is just fantasy\n");
 	/* Crea los procesos apostadores */
 	if(apostador(nApostadores, nCaballos, msqid, sid[0])==-1){
 		freeEverything(semCaballos, mutex, pipePadreACaballo, sid, nCaballos);
 		while(wait(NULL)>0);
 		exit(EXIT_FAILURE);
 	}
+	printf("puta bida tt\n");
 	/* Crea los caballos */
 	if(caballos(nCaballos, pipePadreACaballo, semCaballos, msqid,
 				mutex, sid)==CERROR){
 		while(wait(NULL)>0);
 		exit(EXIT_FAILURE);
 	}
-	printf("sadf" );
+	printf("JUAN SEGURO QUE ES TU PARTE DE MIERDA\n");
 	/* Ir bajando la variable tiempo de 15 a 0 */
 	if((tiempo = shmat(sid[0], NULL, 0))==(void*)-1){
 		perror("Error al obtener la zona compartida de memoria.\n");
@@ -359,7 +364,7 @@ printf("sadf2" );
 				sprintf(buffer, "%d ", posicionCaballo[j]);
 			}
 
-			if(write(pipePadreACaballo[i][ESCRIBIR], buffer, strlen(buffer)-1)==-1){
+			if(write(pipePadreACaballo[i][ESCRIBIR], buffer, strlen(buffer)+1)==-1){
 				perror("Error al escribir en el pipe.");
 				freeEverything(semCaballos, mutex, pipePadreACaballo, sid, nCaballos);
 			}
