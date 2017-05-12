@@ -97,7 +97,6 @@ int incializarVariablesCompartidas(int nCaballos, int nApostadores, int sid[3],
 
 
 		key = ftok("keys/key1", PROJID+1);
-		printf("%d\n", key);
 		if((sid[1] = shmget(key, sizeof(int)*nCaballos,
 				IPC_CREAT| IPC_EXCL| SHM_R | SHM_W))==-1){
 				if(errno==17 /*file exists*/){
@@ -109,7 +108,7 @@ int incializarVariablesCompartidas(int nCaballos, int nApostadores, int sid[3],
 				return -1;
 		}
 
-		printf("Juan no sabe programar\n");
+	
 		/* Inicializamos las posiciones de los caballos */
 		if((posicionCaballo = (int *)shmat(sid[1], NULL, 0))==(void*)-1){
 			shmctl(sid[0], IPC_RMID, (struct shmid_ds*)NULL);
@@ -253,8 +252,7 @@ int main(int argc, char * argv[]){
 	proceso padre y los caballos, asi como los semaforos */
 	pipePadreACaballo = pipesCaballos(nCaballos);
 
-	keySem = ftok("/bin/ls", PROJID);
-	printf("%d",keySem);
+	keySem = ftok("/bin/ls", PROJID+1);
 	if(Crear_Semaforo(keySem, nCaballos, &semCaballos)==ERROR){
 		freePipesCaballos(pipePadreACaballo, nCaballos);
 		perror("Error en semCaballos");
@@ -278,7 +276,7 @@ int main(int argc, char * argv[]){
 		exit(EXIT_FAILURE);
 	}
 
-	printf("sadf2" );
+
 
 	/* Reservamos memoria para las variables de memoria compartida */
 	if(incializarVariablesCompartidas(nCaballos, nApostadores, sid,
@@ -292,7 +290,6 @@ int main(int argc, char * argv[]){
 
 	/* Crea proceso monitor */
 	/*monitor(nCaballos, nApostadores, sid, mutex, matrizApuestasId);*/
-printf("sadf2" );
 	/* Crea proceso gestor de apuestas */
 	if(gestor (nVentanillas, nApostadores, nCaballos, matrizApuestasId, sid[0], msqid, mutex)==-1){
 		freeEverything(semCaballos, mutex, pipePadreACaballo, sid, nCaballos);
@@ -311,7 +308,7 @@ printf("sadf2" );
 		while(wait(NULL)>0);
 		exit(EXIT_FAILURE);
 	}
-	printf("sadf" );
+	
 	/* Ir bajando la variable tiempo de 15 a 0 */
 	if((tiempo = shmat(sid[0], NULL, 0))==(void*)-1){
 		perror("Error al obtener la zona compartida de memoria.\n");
@@ -326,7 +323,6 @@ printf("sadf2" );
 	carreraIniciada = 0;
 	while(carreraIniciada==0){
 		sleep(1);
-		printf("\n\n\n\n HEMOS LLEGAO HASTA AQUIII\n\n\n");
 		if(Down_Semaforo(mutex, 0, SEM_UNDO)==ERROR){
 			perror("Error al hacer down del mutex.\n");
 			freeEverything(semCaballos, mutex, pipePadreACaballo, sid, nCaballos);
@@ -358,8 +354,9 @@ printf("sadf2" );
 			for(j=0;j<nCaballos;j++){
 				sprintf(buffer, "%d ", posicionCaballo[j]);
 			}
-
-			if(write(pipePadreACaballo[i][ESCRIBIR], buffer, strlen(buffer)-1)==-1){
+                        
+                        printf("Caballos.c linea 358: %s\n", buffer);
+			if(write(pipePadreACaballo[i][ESCRIBIR], buffer, strlen(buffer)+1)==-1){
 				perror("Error al escribir en el pipe.");
 				freeEverything(semCaballos, mutex, pipePadreACaballo, sid, nCaballos);
 			}

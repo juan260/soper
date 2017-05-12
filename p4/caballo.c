@@ -56,6 +56,7 @@ int caballo(int * pipe, int semId, int numCaballo,
 				perror("Error al hacer read.\n");
 				exit(EXIT_FAILURE);
 			}
+			printf("Caballo.c linea 59: %s\n", buffer);
 			for(i=0;i<numCaballos;i++){
 				sscanf(buffer, "%d ", &posicionCaballo[i]);
 			}
