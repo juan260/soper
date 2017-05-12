@@ -9,7 +9,7 @@
 #include "apostador.h"
 #include <errno.h>
 #define MAXBUF 100
-#define PROJID 1245
+#define PROJID 45
 
 void argumentosEntrada(int argc, char * argv[], int * nCaballos,
 	int * longCarrera, int * nApostadores, int * nVentanillas){
@@ -253,16 +253,19 @@ int main(int argc, char * argv[]){
 	proceso padre y los caballos, asi como los semaforos */
 	pipePadreACaballo = pipesCaballos(nCaballos);
 
-	keySem = ftok("keys", PROJID+3);
-	if(Crear_Semaforo(keySem, 1, &semCaballos)==ERROR){
+	keySem = ftok("/bin/ls", PROJID);
+	printf("%d",keySem);
+	if(Crear_Semaforo(keySem, nCaballos, &semCaballos)==ERROR){
 		freePipesCaballos(pipePadreACaballo, nCaballos);
+		perror("Error en semCaballos");
 		exit(EXIT_FAILURE);
 	}
 
-	keySem = ftok("keys", PROJID+4);
-	if(Crear_Semaforo(keySem, 1, &mutex)==ERROR){
+	keySem = ftok("/bin/ls", PROJID+4);
+	if(Crear_Semaforo(keySem, 3, &mutex)==ERROR){
 		Borrar_Semaforo(semCaballos);
 		freePipesCaballos(pipePadreACaballo, nCaballos);
+		perror("Error en mutex");
 		exit(EXIT_FAILURE);
 	}
 
@@ -271,9 +274,11 @@ int main(int argc, char * argv[]){
 		Borrar_Semaforo(semCaballos);
 		Borrar_Semaforo(mutex);
 		freePipesCaballos(pipePadreACaballo, nCaballos);
+		perror("Error creacion de cola de mensajes");
 		exit(EXIT_FAILURE);
 	}
 
+	printf("sadf2" );
 
 	/* Reservamos memoria para las variables de memoria compartida */
 	if(incializarVariablesCompartidas(nCaballos, nApostadores, sid,
@@ -287,7 +292,7 @@ int main(int argc, char * argv[]){
 
 	/* Crea proceso monitor */
 	/*monitor(nCaballos, nApostadores, sid, mutex, matrizApuestasId);*/
-
+printf("sadf2" );
 	/* Crea proceso gestor de apuestas */
 	if(gestor (nVentanillas, nApostadores, nCaballos, matrizApuestasId, sid[0], msqid, mutex)==-1){
 		freeEverything(semCaballos, mutex, pipePadreACaballo, sid, nCaballos);
@@ -306,7 +311,7 @@ int main(int argc, char * argv[]){
 		while(wait(NULL)>0);
 		exit(EXIT_FAILURE);
 	}
-
+	printf("sadf" );
 	/* Ir bajando la variable tiempo de 15 a 0 */
 	if((tiempo = shmat(sid[0], NULL, 0))==(void*)-1){
 		perror("Error al obtener la zona compartida de memoria.\n");

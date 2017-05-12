@@ -1,5 +1,5 @@
 /**
-* @brief Fuente del ejercicio 4 
+* @brief Fuente del ejercicio 4
 *
 * En este fuente se implementa la librería de semáforos propuesta en el enunciado.
 * @file semaforos.c
@@ -27,16 +27,16 @@ int Inicializar_Semaforo(int semid, unsigned short *array){
         int val;
         struct semid_ds *semstat;
         unsigned short *array;
-    } arg;	
-    
-    arg.array=array;    
-    
+    } arg;
+
+    arg.array=array;
+
     if(semctl(semid,0,SETALL,arg)==-1){
         perror("Error al inicializar el semaforo\n");
     }
 
 	return OK;
-}   
+}
 
 /***************************************************************
 Nombre: Borrar_Semaforo.
@@ -69,22 +69,23 @@ Salida:
 int Crear_Semaforo(key_t key, int size, int *semid){
 	int sem, ret, i;
     unsigned short *array;
-	
+
     sem = semget(key, size, IPC_CREAT | IPC_EXCL | SHM_R | SHM_W);
 	ret = 0;
 	if(sem==-1){
 		if(errno==EEXIST){
-			sem = semget(key, size, 
+			sem = semget(key, size,
 				IPC_CREAT | SHM_R | SHM_W);
 			ret = 1;
 		}
         if(sem==-1){
+          perror("prueba");
 			return ERROR;
 		}
     }
 
 	array=(unsigned short*)malloc(sizeof(unsigned short)*size);
-    
+
     if(array==NULL){
         Borrar_Semaforo(sem);
         perror("Error en la creacion del semaforo\n");
@@ -99,10 +100,10 @@ int Crear_Semaforo(key_t key, int size, int *semid){
         perror("Error al inicializar el semaforo\n");
 	    return ERROR;
     }
-    *semid=sem;	
+    *semid=sem;
 	free(array);
     return ret;
-}	
+}
 
 /**************************************************************
 Nombre: Down_Semaforo
@@ -118,8 +119,8 @@ Salida:
 int Down_Semaforo(int id, int num_sem, int undo){
 	struct sembuf sem_oper;
 	sem_oper.sem_num = num_sem;
-	sem_oper.sem_op =-1; 
-	sem_oper.sem_flg = undo; 
+	sem_oper.sem_op =-1;
+	sem_oper.sem_flg = undo;
 	if(semop (id, &sem_oper, 1)==-1){
   	        return ERROR;
         }
@@ -169,7 +170,7 @@ int Up_Semaforo(int id, int num_sem, int undo){
 		return ERROR;
 	}
 	return OK;
-        
+
 }
 
 /***************************************************************
