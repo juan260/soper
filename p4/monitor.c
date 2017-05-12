@@ -87,7 +87,7 @@ int monitor(int nCaballos, int nApostadores, int * sid, int mutex,
     	printf("\t- Numero del segundo puesto: %d\n", segundo);
     }
     if(nCaballos>2){
-    	printf("\t- Numero del tercer puesto: %d\n". tercero);
+    	printf("\t- Numero del tercer puesto: %d\n", tercero);
     }
     printf("\n");
     while(1){
