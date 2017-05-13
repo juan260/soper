@@ -59,6 +59,7 @@ int caballo(int * pipe, int semId, int numCaballo,
 				perror("Error al hacer read.\n");
 				exit(EXIT_FAILURE);
 			}
+			printf("\nBuffer leido por el caballo: \n\t%s\n", buffer);
 			for(i=0;i<numCaballos;i++){
 				sscanf(buffer, "%d ", &posicionCaballo[i]);
 			}
@@ -77,28 +78,32 @@ int caballo(int * pipe, int semId, int numCaballo,
 				}
 			}
 
+			printf("\nSoy el caballo %d y voy en posicion %d\n",numCaballo , posicion);
+
 			if(posicion==numCaballos-1){
 				/* Este caballo va primero, tira entre
 				1 y 7 */
-				posicionCaballo[numCaballo]=rand()%6+1;
+				posicionCaballo[numCaballo]+=rand()%6+1;
 			} else if(posicion==0){
 				/* Este caballo va ultimo, tira entre
 				2 y 12 */
-				posicionCaballo[numCaballo]=rand()%10+2;
+				posicionCaballo[numCaballo]+=rand()%10+2;
 			} else {
 				/* Este caballo no va ni primero ni ultimo
 				tendra una tirada normal entre 1 y 6*/
-				posicionCaballo[numCaballo]=rand()%5+1;
+				posicionCaballo[numCaballo]+=rand()%5+1;
 			}
 
 			mensaje.mtype=2;
+			printf("Escribiendo en el mensaje posiciones nuevas de caballos: \n\tS");
 			for(i=0; i<numCaballos; i++){
 				mensaje.posiciones[i]=posicionCaballo[i];
+				printf("%d ", mensaje.posiciones[i]);
 			}
+			printf("\n");
 			for(;i<10;i++){
 				mensaje.posiciones[i]=0;
 			}
-			printf("\nId del mensaje %d\n", msqid);
 			msgsnd(msqid, (struct msbuff*) &mensaje, sizeof(CaballoMsg)-sizeof(long), 0);
 		}
 		shmdt(tiempo);

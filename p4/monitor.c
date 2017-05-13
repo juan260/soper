@@ -68,6 +68,8 @@ int monitor(int nCaballos, int nApostadores, int * sid, int mutex,
       printf("\n");
       sleep(1);
     }
+    while(1);
+
     printf("\n================ Carrera finalizada ==================\n");
     printf("\nMostrando resultados de la carrera: \n");
     Down_Semaforo(mutex, 1, SEM_UNDO);

@@ -286,7 +286,7 @@ int main(int argc, char * argv[]){
 	}
 
 	keyMsg = ftok("/bin/rm", PROJID+4);
-	if((msqid=msgget(keyMsg, 0400|IPC_CREAT|IPC_EXCL))==-1){
+	if((msqid=msgget(keyMsg, 0400|IPC_CREAT|IPC_EXCL|IPC_PRIVATE|00700))==-1){
 		Borrar_Semaforo(semCaballos);
 		Borrar_Semaforo(mutex);
 		freePipesCaballos(pipePadreACaballo, nCaballos);
@@ -375,13 +375,17 @@ int main(int argc, char * argv[]){
 	va enviando y recibiendo las posiciones de los
 	caballos */
 	while(carreraIniciada==1){
-		
+
 		/* Despierto a los caballos y espero sus mensajes */
 		for(i=0;i<nCaballos&&carreraIniciada==1;i++){
-			for(j=0;j<nCaballos;j++){
-				sprintf(buffer, "%d ", posicionCaballo[j]);
+			sleep(1);
+			printf("IMprimiendo buffer: ");
+			sprintf(buffer, "%d", posicionCaballo[0]);
+			for(j=1;j<nCaballos;j++){
+				sprintf(buffer, "%s %d", buffer, posicionCaballo[j]);
 			}
 
+			printf("\nEstado del buffer antes de ser escrito: \n\t%s\n", buffer);
 			if(write(pipePadreACaballo[i][ESCRIBIR], buffer, strlen(buffer)+1)==-1){
 				perror("Error al escribir en el pipe.");
 				freeEverything(semCaballos, mutex, pipePadreACaballo, sid, nCaballos, msqid);
@@ -395,10 +399,12 @@ int main(int argc, char * argv[]){
 			msgrcv(msqid, (struct msgbuf*)&caballorcv, sizeof(CaballoMsg)-sizeof(long), 2, 0);
 
 			Down_Semaforo(mutex, 1, SEM_UNDO);
+			printf("Nuevas posiciones: ");
 			for (j=0;j<nCaballos;j++){
-				posicionCaballo[j]=caballorcv.posiciones[i];
+				posicionCaballo[j]=caballorcv.posiciones[j];
+				printf("%d ",posicionCaballo[j]);
 			}
-
+			printf("\n");
 			Up_Semaforo(mutex, 1, SEM_UNDO);
 
 			/* Actualizamos el estado de la variable tiempo */
