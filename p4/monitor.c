@@ -68,7 +68,17 @@ int monitor(int nCaballos, int nApostadores, int * sid, int mutex,
       printf("\n");
       sleep(1);
     }
-    while(1);
+
+    
+    while((*tiempo)==0){
+
+      printf("Posiones actuales de los caballos: ");
+      for(i=0;i<nCaballos;i++){
+        printf("%d ", posicionCaballo[i]);
+      }
+      printf("\n");
+      usleep(1000);
+    }
 
     printf("\n================ Carrera finalizada ==================\n");
     printf("\nMostrando resultados de la carrera: \n");
