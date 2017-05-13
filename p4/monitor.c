@@ -33,11 +33,15 @@ int monitor(int nCaballos, int nApostadores, int * sid, int mutex,
       } else if(tiempoAux<0){
         break;
       } else {
-        printf("\tCarrera comenzada.\n");
+        printf("\n============== Carrera comenzada ============\n");
+        break;
       }
       printf("\tEstado de las apuestas: (valores totales apostados por cada apostador a\n\t"
           "  cada caballo, en, orden creciente segun el numero del caballo)\n");
       sumaTotal = 0;
+
+
+
       Down_Semaforo(mutex, 2, SEM_UNDO);
       for(i=0;i<nApostadores;i++){
         printf("\t\t- El Apostador-%d ha apostado: ", i);
@@ -64,7 +68,7 @@ int monitor(int nCaballos, int nApostadores, int * sid, int mutex,
       printf("\n");
       sleep(1);
     }
-    printf("\n================Carrera finalizada==================\n");
+    printf("\n================ Carrera finalizada ==================\n");
     printf("\nMostrando resultados de la carrera: \n");
     Down_Semaforo(mutex, 1, SEM_UNDO);
     primero = 0;

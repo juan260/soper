@@ -5,6 +5,7 @@ typedef struct gestorinfo{
 	int *tiempo;
 	int msqid;
 	int mutex;
+	pthread_mutex_t * threadMutex;
 }GestorInfo;
 
 void* ventanilla(void *info){
@@ -12,15 +13,18 @@ void* ventanilla(void *info){
 	while(*(g->tiempo)>0){
 		ApuestaMsg rcv;
 		msgrcv(g->msqid,  (struct msgbuf*)&rcv, sizeof(ApuestaMsg)-sizeof(long), 1, 0);
+		/*pthread_mutex_lock(g->threadMutex);
 		if(Down_Semaforo(g->mutex, 2, SEM_UNDO)==ERROR){
 			perror("Error de semaforos en el gestor de apuestas");
 			return NULL;
-		}
-		g->axc[rcv.numapostador][rcv.numcaballo]+=rcv.apuesta;
+		}*/
+		printf("Apuesta lograda: rcv.apuesta = %f", rcv.apuesta);
+	/*	g->axc[rcv.numapostador][rcv.numcaballo]+=rcv.apuesta;
 		if(Up_Semaforo(g->mutex, 2, SEM_UNDO)==ERROR){
 			perror("Error de semaforos en el gestor de apuestas");
 			return NULL;
 		}
+		pthread_mutex_unlock(g->threadMutex);*/
 	}
 	return NULL;
 }
@@ -63,6 +67,7 @@ int gestor (int nventanillas, int napostadores, int ncaballos, int *mid, int tie
 		g->axc=axc;
 		g->msqid=msqid;
 		g->mutex=semid;
+		pthread_mutex_init(g->threadMutex, NULL);
 		for(i=0; i<nventanillas; i++){
 			 pthread_create(&ventanillas[i], NULL, ventanilla, (void*) g);
 		}

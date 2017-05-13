@@ -109,7 +109,7 @@ int incializarVariablesCompartidas(int nCaballos, int nApostadores, int sid[3],
 				return -1;
 		}
 
-	
+
 		/* Inicializamos las posiciones de los caballos */
 		if((posicionCaballo = (int *)shmat(sid[1], NULL, 0))==(void*)-1){
 			shmctl(sid[0], IPC_RMID, (struct shmid_ds*)NULL);
@@ -185,6 +185,33 @@ int incializarVariablesCompartidas(int nCaballos, int nApostadores, int sid[3],
 		return 0;
 }
 
+int inicializarSemaforos(int * semCaballos, int * mutex, int nCaballos){
+	int keySem, j;
+
+	keySem = ftok("/bin/ls", PROJID+1);
+	if(Crear_Semaforo(keySem, nCaballos, semCaballos)==ERROR){
+		perror("Error en semCaballos");
+		return ERROR;
+	}
+
+	keySem = ftok("/bin/ls", PROJID+4);
+	if(Crear_Semaforo(keySem, 3, mutex)==ERROR){
+		Borrar_Semaforo(*semCaballos);
+		perror("Error en mutex");
+		return ERROR;
+	}
+	for(j=0;j<3;j++){
+		if(Up_Semaforo(*mutex,j, SEM_UNDO) == ERROR){
+			Borrar_Semaforo(*semCaballos);
+			Borrar_Semaforo(*mutex);
+			perror("Error en mutex");
+			return ERROR;
+		}
+	}
+
+	return OK;
+}
+
 void freeVariablesCompartidas(int * sid){
 	if((shmctl(sid[0], IPC_RMID, (struct shmid_ds*)NULL)==-1) ||
 		 (shmctl(sid[1], IPC_RMID, (struct shmid_ds*)NULL)==-1)){
@@ -193,8 +220,9 @@ void freeVariablesCompartidas(int * sid){
 }
 
 void freeEverything(int semCaballos, int mutex, int ** pipePadreACaballo,
-	int * sid, int nCaballos){
+	int * sid, int nCaballos, int msqid){
 	Borrar_Semaforo(semCaballos);
+	msgctl (msqid, IPC_RMID, (struct msqid_ds *)NULL);
 	Borrar_Semaforo(mutex);
 	freePipesCaballos(pipePadreACaballo, nCaballos);
 	freeVariablesCompartidas(sid);
@@ -243,8 +271,6 @@ int main(int argc, char * argv[]){
 		por cada apostador. (apostadorxcaballo) */
 	int * matrizApuestas[10];
 
- printf("si esto sale dos veces estamos jodidos\n");
-
 	/* Comprobacion de los argumentos de entrada */
 	argumentosEntrada(argc, argv, &nCaballos, &longCarrera, &nApostadores,
 				&nVentanillas);
@@ -254,28 +280,21 @@ int main(int argc, char * argv[]){
 	proceso padre y los caballos, asi como los semaforos */
 	pipePadreACaballo = pipesCaballos(nCaballos);
 
-	keySem = ftok("/bin/ls", PROJID+1);
-
-	if(Crear_Semaforo(keySem, nCaballos, &semCaballos)==ERROR){
+	if(inicializarSemaforos(&semCaballos, &mutex, nCaballos)==ERROR){
 		freePipesCaballos(pipePadreACaballo, nCaballos);
-		perror("Error en semCaballos");
 		exit(EXIT_FAILURE);
 	}
 
-	keySem = ftok("/bin/ls", PROJID+4);
-	if(Crear_Semaforo(keySem, 3, &mutex)==ERROR){
-		Borrar_Semaforo(semCaballos);
-		freePipesCaballos(pipePadreACaballo, nCaballos);
-		perror("Error en mutex");
-		exit(EXIT_FAILURE);
-	}
-
-	keyMsg = ftok("/bin/ls", PROJID+5);
-	if((msqid=msgget(keyMsg, 0600|IPC_CREAT))==-1){
+	keyMsg = ftok("/bin/rm", PROJID+4);
+	if((msqid=msgget(keyMsg, 0400|IPC_CREAT|IPC_EXCL))==-1){
 		Borrar_Semaforo(semCaballos);
 		Borrar_Semaforo(mutex);
 		freePipesCaballos(pipePadreACaballo, nCaballos);
+		if(errno==EEXIST){
+			msgctl (msqid, IPC_RMID, (struct msqid_ds *)NULL);
+		}
 		perror("Error creacion de cola de mensajes");
+		printf("%d", keyMsg);
 		exit(EXIT_FAILURE);
 	}
 
@@ -285,47 +304,38 @@ int main(int argc, char * argv[]){
 	if(incializarVariablesCompartidas(nCaballos, nApostadores, sid,
 			&matrizApuestasId)==-1){
 		perror("Error al incializar las variables de memoria compartida.\n");
+		msgctl (msqid, IPC_RMID, (struct msqid_ds *)NULL);
 		Borrar_Semaforo(semCaballos);
 		Borrar_Semaforo(mutex);
 		freePipesCaballos(pipePadreACaballo, nCaballos);
 		exit(EXIT_FAILURE);
 	}
-		printf("is this the real life\n" );
+
 	/* Crea proceso monitor */
-	/*monitor(nCaballos, nApostadores, sid, mutex, matrizApuestasId);*/
+	monitor(nCaballos, nApostadores, sid, mutex, matrizApuestasId);
 	/* Crea proceso gestor de apuestas */
 	if((ret=gestor (nVentanillas, nApostadores, nCaballos, matrizApuestasId, sid[0], msqid, mutex))==-1){
-		freeEverything(semCaballos, mutex, pipePadreACaballo, sid, nCaballos);
+		freeEverything(semCaballos, mutex, pipePadreACaballo, sid, nCaballos, msqid);
 		while(wait(NULL)>0);
 		exit(EXIT_FAILURE);
 	}
 	else if(ret==2){
 		exit(EXIT_SUCCESS);
 	}
-	printf("or is just fantasy\n");
+
 	/* Crea los procesos apostadores */
 	if(apostador(nApostadores, nCaballos, msqid, sid[0])==-1){
-		freeEverything(semCaballos, mutex, pipePadreACaballo, sid, nCaballos);
+		freeEverything(semCaballos, mutex, pipePadreACaballo, sid, nCaballos, msqid);
 		while(wait(NULL)>0);
 		exit(EXIT_FAILURE);
 	}
-	printf("puta bida tt\n");
-	/* Crea los caballos */
-	if(caballos(nCaballos, pipePadreACaballo, semCaballos, msqid,
-				mutex, sid)==CERROR){
-		while(wait(NULL)>0);
-		exit(EXIT_FAILURE);
-	}
+
+
 
 	/* Ir bajando la variable tiempo de 15 a 0 */
 	if((tiempo = shmat(sid[0], NULL, 0))==(void*)-1){
 		perror("Error al obtener la zona compartida de memoria.\n");
-		freeEverything(semCaballos, mutex, pipePadreACaballo, sid, nCaballos);
-	}
-
-	if(Up_Semaforo(mutex, 0, SEM_UNDO)==ERROR){
-		perror("Error al hacer down del mutex.\n");
-		freeEverything(semCaballos, mutex, pipePadreACaballo, sid, nCaballos);
+		freeEverything(semCaballos, mutex, pipePadreACaballo, sid, nCaballos, msqid);
 	}
 
 	carreraIniciada = 0;
@@ -333,30 +343,39 @@ int main(int argc, char * argv[]){
 		sleep(1);
 		if(Down_Semaforo(mutex, 0, SEM_UNDO)==ERROR){
 			perror("Error al hacer down del mutex.\n");
-			freeEverything(semCaballos, mutex, pipePadreACaballo, sid, nCaballos);
+			freeEverything(semCaballos, mutex, pipePadreACaballo, sid, nCaballos, msqid);
 		}
+
 		if(*tiempo>0){
-			*tiempo--;
+			(*tiempo)--;
 		} else {
 			carreraIniciada = 1;
 		}
 		if(Up_Semaforo(mutex, 0, SEM_UNDO)==ERROR){
 			perror("Error al hacer up del mutex.\n");
-			freeEverything(semCaballos, mutex, pipePadreACaballo, sid, nCaballos);
+			freeEverything(semCaballos, mutex, pipePadreACaballo, sid, nCaballos, msqid);
 			exit(EXIT_FAILURE);
 		}
 	}
 
 	if((posicionCaballo = (int *)shmat(sid[1], NULL, 0))==(void*)-1){
 		perror("Error al obtener posicionCaballo.\n");
-		freeEverything(semCaballos, mutex, pipePadreACaballo, sid, nCaballos);
+		freeEverything(semCaballos, mutex, pipePadreACaballo, sid, nCaballos, msqid);
 		exit(EXIT_FAILURE);
 	}
+
+	/* Crea los caballos */
+	if(caballos(nCaballos, pipePadreACaballo, semCaballos, msqid,
+				mutex, sid)==CERROR){
+		while(wait(NULL)>0);
+		exit(EXIT_FAILURE);
+	}
+
 	/* Bucle que va despertando a los caballos y les
 	va enviando y recibiendo las posiciones de los
 	caballos */
 	while(carreraIniciada==1){
-
+		
 		/* Despierto a los caballos y espero sus mensajes */
 		for(i=0;i<nCaballos&&carreraIniciada==1;i++){
 			for(j=0;j<nCaballos;j++){
@@ -365,12 +384,12 @@ int main(int argc, char * argv[]){
 
 			if(write(pipePadreACaballo[i][ESCRIBIR], buffer, strlen(buffer)+1)==-1){
 				perror("Error al escribir en el pipe.");
-				freeEverything(semCaballos, mutex, pipePadreACaballo, sid, nCaballos);
+				freeEverything(semCaballos, mutex, pipePadreACaballo, sid, nCaballos, msqid);
 			}
 
 			if(Up_Semaforo(semCaballos, i, SEM_UNDO)==ERROR){
 				perror("Error al hacer up de semCaballos.\n");
-				freeEverything(semCaballos, mutex, pipePadreACaballo, sid, nCaballos);
+				freeEverything(semCaballos, mutex, pipePadreACaballo, sid, nCaballos, msqid);
 			}
 
 			msgrcv(msqid, (struct msgbuf*)&caballorcv, sizeof(CaballoMsg)-sizeof(long), 2, 0);
@@ -385,14 +404,14 @@ int main(int argc, char * argv[]){
 			/* Actualizamos el estado de la variable tiempo */
 			if(Down_Semaforo(mutex, 0, SEM_UNDO)==ERROR){
 				perror("Error al hacer down de mutex.\n");
-				freeEverything(semCaballos, mutex, pipePadreACaballo, sid, nCaballos);
+				freeEverything(semCaballos, mutex, pipePadreACaballo, sid, nCaballos, msqid);
 			}
 
 			/* Si ha ganado algun caballo lo actualizamos */
 
 			if(Up_Semaforo(mutex, 0, SEM_UNDO)==ERROR){
 				perror("Error al hacer up de mutex.\n");
-				freeEverything(semCaballos, mutex, pipePadreACaballo, sid, nCaballos);
+				freeEverything(semCaballos, mutex, pipePadreACaballo, sid, nCaballos, msqid);
 			}
 		}
 	}
@@ -403,7 +422,7 @@ int main(int argc, char * argv[]){
 	for(i=0;i<nCaballos;i++){
 		if(Up_Semaforo(semCaballos, i, SEM_UNDO)==ERROR){
 			perror("Error al hacer up de semCaballos.\n");
-			freeEverything(semCaballos, mutex, pipePadreACaballo, sid, nCaballos);
+			freeEverything(semCaballos, mutex, pipePadreACaballo, sid, nCaballos, msqid);
 		}
 	}
 
@@ -411,16 +430,16 @@ int main(int argc, char * argv[]){
 		sleep(1);
 		if(Down_Semaforo(mutex, 0, SEM_UNDO)==ERROR){
 			perror("Error al hacer down del mutex.\n");
-			freeEverything(semCaballos, mutex, pipePadreACaballo, sid, nCaballos);
+			freeEverything(semCaballos, mutex, pipePadreACaballo, sid, nCaballos, msqid);
 		}
 		*tiempo--;
 		if(Up_Semaforo(mutex, 0, SEM_UNDO)==ERROR){
 			perror("Error al hacer up del mutex.\n");
-			freeEverything(semCaballos, mutex, pipePadreACaballo, sid, nCaballos);
+			freeEverything(semCaballos, mutex, pipePadreACaballo, sid, nCaballos, msqid);
 			exit(EXIT_FAILURE);
 		}
 	}
-	freeEverything(semCaballos,mutex,pipePadreACaballo,sid,nCaballos);
+	freeEverything(semCaballos,mutex,pipePadreACaballo,sid,nCaballos,msqid);
 	while(wait(NULL)>0);
 
 	exit(EXIT_SUCCESS);

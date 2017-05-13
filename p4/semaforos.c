@@ -68,22 +68,19 @@ Salida:
 **************************************************************/
 int Crear_Semaforo(key_t key, int size, int *semid){
 	int sem, ret, i;
-    unsigned short *array;
+  unsigned short *array;
 
-    sem = semget(key, size, IPC_CREAT | IPC_EXCL | SHM_R | SHM_W);
-        ret = 0;
+  sem = semget(key, size, IPC_CREAT | IPC_EXCL | SHM_R | SHM_W);
+	ret = 0;
 	if(sem==-1){
 		if(errno==EEXIST){
-			Borrar_Semaforo(semget(key, 0,
-				IPC_CREAT | SHM_R | SHM_W));
-			sem = semget(key, size, IPC_CREAT | IPC_EXCL | SHM_R | SHM_W);
-			if(sem==-1){
-			        return ERROR;
-			        }
-		} else {
-		        return ERROR; 
+			sem = semget(key, size,
+				IPC_CREAT | SHM_R | SHM_W);
+			ret = 1;
 		}
-        }
+    return ERROR;
+	}
+
 
 	array=(unsigned short*)malloc(sizeof(unsigned short)*size);
 

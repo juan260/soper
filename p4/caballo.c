@@ -5,7 +5,10 @@
 #define MAXBUF 100
 
 int caballo(int * pipe, int semId, int numCaballo,
-				int numCaballos, int msqid, int mutex, int *sid){
+				int numCaballos,
+				int msqid,
+				int mutex,
+				int *sid){
 	int ret, i, posicion, tirada;
 	int posicionCaballo[10];
 	int * tiempo;
@@ -30,7 +33,7 @@ int caballo(int * pipe, int semId, int numCaballo,
 				exit(EXIT_FAILURE);
 			}
 
-			/* Comprobamos si ha terminadola carrera */
+			/* Comprobamos si ha terminado la carrera */
 			if(Down_Semaforo(mutex,0,SEM_UNDO)==CERROR){
 				close(pipe[LEER]);
 				close(pipe[ESCRIBIR]);
@@ -56,7 +59,6 @@ int caballo(int * pipe, int semId, int numCaballo,
 				perror("Error al hacer read.\n");
 				exit(EXIT_FAILURE);
 			}
-			printf("Caballo.c linea 59: %s\n", buffer);
 			for(i=0;i<numCaballos;i++){
 				sscanf(buffer, "%d ", &posicionCaballo[i]);
 			}
@@ -93,13 +95,11 @@ int caballo(int * pipe, int semId, int numCaballo,
 			for(i=0; i<numCaballos; i++){
 				mensaje.posiciones[i]=posicionCaballo[i];
 			}
-			if(msgsnd(msqid, (struct msbuff*) &mensaje, sizeof(CaballoMsg)-sizeof(long), 0)==-1){
-				close(pipe[LEER]);
-				close(pipe[ESCRIBIR]);
-				shmdt(tiempo);
-				perror("Error al enviar el mensaje desde el caballo.\n");
-				exit(EXIT_FAILURE);
+			for(;i<10;i++){
+				mensaje.posiciones[i]=0;
 			}
+			printf("\nId del mensaje %d\n", msqid);
+			msgsnd(msqid, (struct msbuff*) &mensaje, sizeof(CaballoMsg)-sizeof(long), 0);
 		}
 		shmdt(tiempo);
 		close(pipe[LEER]);
