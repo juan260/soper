@@ -438,16 +438,16 @@ int main(int argc, char * argv[]){
 			perror("Error al hacer down del mutex.\n");
 			freeEverything(semCaballos, mutex, pipePadreACaballo, sid, nCaballos, msqid);
 		}
-		*tiempo--;
+		(*tiempo)--;
 		if(Up_Semaforo(mutex, 0, SEM_UNDO)==ERROR){
 			perror("Error al hacer up del mutex.\n");
 			freeEverything(semCaballos, mutex, pipePadreACaballo, sid, nCaballos, msqid);
 			exit(EXIT_FAILURE);
 		}
 	}
-	freeEverything(semCaballos,mutex,pipePadreACaballo,sid,nCaballos,msqid);
+
 	printf("\nWaiteando....\n");
 	while(wait(NULL)>0);
-
+	freeEverything(semCaballos,mutex,pipePadreACaballo,sid,nCaballos,msqid);
 	exit(EXIT_SUCCESS);
 }

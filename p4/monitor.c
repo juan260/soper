@@ -69,7 +69,7 @@ int monitor(int nCaballos, int nApostadores, int * sid, int mutex,
       sleep(1);
     }
 
-    
+
     while((*tiempo)==0){
 
       printf("Posiones actuales de los caballos: ");
@@ -87,38 +87,45 @@ int monitor(int nCaballos, int nApostadores, int * sid, int mutex,
     segundo = 0;
     tercero = 0;
    	for(i=1;i<nCaballos;i++){
+      printf("Probando: %d\n", posicionCaballo[i]);
    		if(posicionCaballo[i]>posicionCaballo[primero]){
    			tercero = segundo;
    			segundo = primero;
-   		} else if(posicionCaballo[i]>posicionCaballo[segundo]) {
+        primero = i;
+   		} else if((posicionCaballo[i]>posicionCaballo[segundo])||(segundo==primero)) {
    			tercero = segundo;
    			segundo = i;
-   		} else if(posicionCaballo[i]>posicionCaballo[segundo]) {
+   		} else if((posicionCaballo[i]>posicionCaballo[tercero])||(tercero==segundo)||(tercer==primero)) {
    			tercero = i;
    		}
    	}
    	Up_Semaforo(mutex,1,SEM_UNDO);
-    printf("\t- Numero del caballo ganador: %d\n", primero);
+    printf("\t- Numero del caballo ganador: %d\n\t\t"
+    "Cotizacion del caballo: %d", primero);
     if(nCaballos>1){
-    	printf("\t- Numero del segundo puesto: %d\n", segundo);
+    	printf("\t- Numero del segundo puesto: %d\n\t\t"
+      "Cotizacion del caballo: %d", segundo);
     }
     if(nCaballos>2){
-    	printf("\t- Numero del tercer puesto: %d\n", tercero);
+    	printf("\t- Numero del tercer puesto: %d\n\t\t"
+      "Cotizacion del caballo: %d", tercero);
     }
     printf("\n");
     while(1){
       if(*tiempo<=-15){
         break;
       }
-      printf("Segundos restantes para mostrar resultados\n\t de las apuestas: %d\n", *tiempo);
+      printf("Segundos restantes para mostrar resultados\n\t de las apuestas: %d\n", 15+(*tiempo));
       sleep(1);
     }
 
-
+    printf("\nMostrando resultados de las apuestas: \n");
+    printf("");
 
     shmdt(tiempo);
     shmdt(posicionCaballo);
     shmdt(matrizApuestas);
+    exit(EXIT_SUCCESS);
   } else {
     return ret;
   }
