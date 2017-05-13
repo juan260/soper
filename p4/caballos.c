@@ -402,23 +402,27 @@ int main(int argc, char * argv[]){
 			printf("Nuevas posiciones: ");
 			for (j=0;j<nCaballos;j++){
 				posicionCaballo[j]=caballorcv.posiciones[j];
+				if(posicionCaballo[j]>=longCarrera){
+					carreraIniciada=0;
+					/* Actualizamos el estado de la variable tiempo */
+					if(Down_Semaforo(mutex, 0, SEM_UNDO)==ERROR){
+						perror("Error al hacer down de mutex.\n");
+						freeEverything(semCaballos, mutex, pipePadreACaballo, sid, nCaballos, msqid);
+					}
+
+					*tiempo = -1;
+
+					if(Up_Semaforo(mutex, 0, SEM_UNDO)==ERROR){
+						perror("Error al hacer up de mutex.\n");
+						freeEverything(semCaballos, mutex, pipePadreACaballo, sid, nCaballos, msqid);
+					}
+				}
 				printf("%d ",posicionCaballo[j]);
 			}
 			printf("\n");
 			Up_Semaforo(mutex, 1, SEM_UNDO);
 
-			/* Actualizamos el estado de la variable tiempo */
-			if(Down_Semaforo(mutex, 0, SEM_UNDO)==ERROR){
-				perror("Error al hacer down de mutex.\n");
-				freeEverything(semCaballos, mutex, pipePadreACaballo, sid, nCaballos, msqid);
-			}
 
-			/* Si ha ganado algun caballo lo actualizamos */
-
-			if(Up_Semaforo(mutex, 0, SEM_UNDO)==ERROR){
-				perror("Error al hacer up de mutex.\n");
-				freeEverything(semCaballos, mutex, pipePadreACaballo, sid, nCaballos, msqid);
-			}
 		}
 	}
 

@@ -13,6 +13,8 @@ int caballo(int * pipe, int semId, int numCaballo,
 	int posicionCaballo[10];
 	int * tiempo;
 	char buffer[MAXBUF];
+	char * token;
+	char separator[2] = " ";
 	CaballoMsg mensaje;
 
 
@@ -59,9 +61,11 @@ int caballo(int * pipe, int semId, int numCaballo,
 				perror("Error al hacer read.\n");
 				exit(EXIT_FAILURE);
 			}
-			printf("\nBuffer leido por el caballo: \n\t%s\n", buffer);
+			
+			token = strtok(buffer, separator);
 			for(i=0;i<numCaballos;i++){
-				sscanf(buffer, "%d ", &posicionCaballo[i]);
+				posicionCaballo[i] = atoi(token);
+				token = strtok(NULL, separator);
 			}
 			/* Comprobamos la posicion del caballo
 			y despues si es el primero o ultimo.
@@ -77,9 +81,6 @@ int caballo(int * pipe, int semId, int numCaballo,
 					posicion++;
 				}
 			}
-
-			printf("\nSoy el caballo %d y voy en posicion %d\n",numCaballo , posicion);
-
 			if(posicion==numCaballos-1){
 				/* Este caballo va primero, tira entre
 				1 y 7 */
@@ -95,12 +96,9 @@ int caballo(int * pipe, int semId, int numCaballo,
 			}
 
 			mensaje.mtype=2;
-			printf("Escribiendo en el mensaje posiciones nuevas de caballos: \n\tS");
 			for(i=0; i<numCaballos; i++){
 				mensaje.posiciones[i]=posicionCaballo[i];
-				printf("%d ", mensaje.posiciones[i]);
 			}
-			printf("\n");
 			for(;i<10;i++){
 				mensaje.posiciones[i]=0;
 			}
