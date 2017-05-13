@@ -3,9 +3,8 @@
 int apostador(int numapostadores, int numcaballos, int msqid, int tiempop){
 	int ret, i;
 	int *tiempo;
-	ApuestaMsg rcv;
 	ApuestaMsg apuesta;
-	srand(time(NULL)*getpid()>>16);
+	
 	if((tiempo = shmat(tiempop, NULL, 0))== (void*)-1){
 		perror("Error al obtener la zona compartida de memoria en el apostador\n");
 		*tiempo=-1;
@@ -17,12 +16,13 @@ int apostador(int numapostadores, int numcaballos, int msqid, int tiempop){
 	}
 	else if (ret==0){
 		for (i=0; i<numapostadores; i++){
-			if(ret=fork()<0){
+			if((ret=fork())<0){
 				perror("Error haciendo fork en el proceso apostador");
 				*tiempo=-1;
 				return -1;
 			}
-			if(ret==0){
+			else if(ret==0){
+				srand(time(NULL)*getpid()>>16);
 				while ((*tiempo)>0){
 					apuesta.mtype = 1;
 					apuesta.numapostador = i;
@@ -33,8 +33,9 @@ int apostador(int numapostadores, int numcaballos, int msqid, int tiempop){
 					}
 					usleep(100000);
 				}
-				msgrcv(msqid,  (struct msgbuf*)&rcv, sizeof(ApuestaMsg)-sizeof(long), 1, 0);shmdt(tiempo);
 				exit(EXIT_SUCCESS);
+			}
+			else{
 			}
 		}
 		while(wait(NULL)>0);
